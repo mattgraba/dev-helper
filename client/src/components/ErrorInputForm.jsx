@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 
 function ErrorInputForm() {
   const [errorText, setErrorText] = useState("");
-  const [response, setResponse] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [response, setResponse] = useState("");     // [response] State & Display: Store and show the AI-generated explanation and fix for the error.
+  const [loading, setLoading] = useState(false);    // [loading] State: Show the user that a background process (fetching AI response) is in progress.
+  const [error, setError] = useState(null);         // [error] Handling: Gracefully handle and communicate any issues from the backend (e.g. 500 Internal Server Error).
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -21,8 +21,8 @@ function ErrorInputForm() {
         body: JSON.stringify({ errorText }),
       });
 
+      // [error] Handling: In handleSubmit()
       if (!res.ok) {
-        // Specifically handle 500 error
         if (res.status === 500) {
           throw new Error('Internal Server Error: Failed to analyze the error.');
         } else {
@@ -30,10 +30,13 @@ function ErrorInputForm() {
         }
       }
 
+      // [response] State & Display: Set after a successful fetch
       const data = await res.json();
       setResponse(data.response);
+
+      // [error] Handling: If an error is thrown
     } catch (err) {
-      console.error("Error during fetch:", err);
+      console.error("Error during fetch:", err);    // Error Logging with console.error()
       setError(err.message || 'Failed to analyze the error. Please try again.');
     } finally {
       setLoading(false);
@@ -52,18 +55,19 @@ function ErrorInputForm() {
           placeholder="Paste your error here..."
         />
         <br />
+        {/* Button Disabled During Fetch: Prevent duplicate submits while a request is pending */}
         <button type="submit" disabled={loading}>
           {loading ? '⏳ Analyzing...' : 'Analyze Error'}
         </button>
       </form>
 
-      {/* Show error message */}
+      {/* [error] Handling: Displayed in UI */}
       {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
 
       {/* Show loading message */}
       {loading && <p>Waiting for AI response...</p>}
 
-      {/* Show AI response */}
+      {/* [response] State & Display: Rendered in the UI (Show AI response)*/}
       {response && !loading && (
         <div style={{ marginTop: '1rem' }}>
           <h3>AI Response:</h3>
