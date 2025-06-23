@@ -22,14 +22,19 @@ function ErrorInputForm() {
       });
 
       if (!res.ok) {
-        throw new Error(`Server error: ${res.status}`);
+        // Specifically handle 500 error
+        if (res.status === 500) {
+          throw new Error('Internal Server Error: Failed to analyze the error.');
+        } else {
+          throw new Error(`Unexpected error: ${res.status}`);
+        }
       }
 
       const data = await res.json();
       setResponse(data.response);
     } catch (err) {
-      console.error(err);
-      setError('Failed to analyze the error. Please try again.');
+      console.error("Error during fetch:", err);
+      setError(err.message || 'Failed to analyze the error. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -48,20 +53,33 @@ function ErrorInputForm() {
         />
         <br />
         <button type="submit" disabled={loading}>
-          {loading ? 'Analyzing...' : 'Analyze Error'}
+          {loading ? '⏳ Analyzing...' : 'Analyze Error'}
         </button>
       </form>
 
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      {/* Show error message */}
+      {error && <p style={{ color: 'red', marginTop: '1rem' }}>{error}</p>}
 
-      {response && (
-        <div>
+      {/* Show loading message */}
+      {loading && <p>Waiting for AI response...</p>}
+
+      {/* Show AI response */}
+      {response && !loading && (
+        <div style={{ marginTop: '1rem' }}>
           <h3>AI Response:</h3>
-          <pre>{response}</pre>
+          <pre style={{
+            background: '#f0f0f0',
+            padding: '1em',
+            borderRadius: '6px',
+            whiteSpace: 'pre-wrap',
+            lineHeight: '1.5'
+          }}>
+            {response}
+          </pre>
         </div>
       )}
     </div>
   );
 }
 
-export default ErrorInputForm;
+export default ErrorInputForm
