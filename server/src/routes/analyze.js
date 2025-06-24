@@ -4,7 +4,7 @@ const Response = require('../models/Response');
 const { getAIResponse } = require('../services/openaiService');
 
 router.post('/', async (req, res) => {
-  const { errorText } = req.body;
+  const { errorText, userId } = req.body;
 
   if (!errorText) return res.status(400).json({ error: 'Missing errorText' });
 
@@ -12,7 +12,7 @@ router.post('/', async (req, res) => {
     const aiResponse = await getAIResponse(errorText);
 
     // Save to DB
-    await Response.create({ prompt: errorText, aiResponse });
+    await Response.create({ prompt: errorText, aiResponse, userId });
 
     res.json({ response: aiResponse });
   } catch (error) {
