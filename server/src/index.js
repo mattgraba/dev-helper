@@ -9,6 +9,7 @@ const scaffoldRoute = require('./routes/scaffold');
 const generateRoute = require('./routes/generate');
 const explainRoute = require('./routes/explain');
 const fixRoute = require('./routes/fix');
+const terminalRoute = require('./routes/terminal');
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use('/scaffold', scaffoldRoute);
 app.use('/generate', generateRoute);
 app.use('/explain', explainRoute);
 app.use('/fix', fixRoute);
+app.use('/terminal', terminalRoute);
 
 
 mongoose.connect(process.env.MONGODB_URI, {
