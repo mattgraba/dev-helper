@@ -5,12 +5,14 @@ const mongoose = require('mongoose');
 
 const analyzeRoute = require('./routes/analyze'); // 👈 Import your route
 const historyRoute = require('./routes/history');
+const scaffoldRoute = require('./routes/scaffold');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 app.use('/history', historyRoute);
+app.use('/scaffold', scaffoldRoute);
 
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,

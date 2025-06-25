@@ -1,13 +1,8 @@
 const { OpenAI } = require('openai');
-
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 /**
- * Sends error text to OpenAI and returns the AI's response.
- * @param {string} errorText - The error message to analyze.
- * @returns {Promise<string>} AI-generated explanation and fix.
+ * Analyzes error text (existing functionality)
  */
 async function getAIResponse(errorText) {
   const completion = await openai.chat.completions.create({
@@ -20,4 +15,20 @@ async function getAIResponse(errorText) {
   return completion.choices[0].message.content;
 }
 
-module.exports = { getAIResponse };
+/**
+ * Generic prompt sender for flexible tasks like scaffolding
+ */
+async function sendPrompt(prompt) {
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [
+      { role: 'system', content: 'You are a senior software engineer and project scaffolding expert.' },
+      { role: 'user', content: prompt },
+    ],
+    temperature: 0.7,
+    max_tokens: 1500,
+  });
+  return completion.choices[0].message.content;
+}
+
+module.exports = { getAIResponse, sendPrompt };
