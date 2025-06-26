@@ -28,7 +28,7 @@ Respond ONLY with code and brief explanations if needed.
 
   try {
     const response = await sendPrompt(prompt);
-    res.json({ result: response });
+    res.json({ componentCode: response });
   } catch (err) {
     console.error('Scaffold route error:', err);
     res.status(500).json({ error: 'Failed to get scaffold output' });

@@ -1,6 +1,14 @@
 {
+  "name": "dev-helper-ai",
+  "version": "1.0.0",
+  "bin": {
+    "dev-helper": "./cli.js"
+  },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
+    "axios": "^1.10.0",
+    "chalk": "^4.1.2",
+    "commander": "^14.0.0",
     "react-redux": "^9.2.0"
   }
 }

@@ -14,7 +14,12 @@ router.post('/', async (req, res) => {
     // Save to DB
     await Response.create({ prompt: errorText, aiResponse, userId });
 
-    res.json({ response: aiResponse });
+    const parts = aiResponse.split(/Fix:/i);
+
+    const explanation = parts[0].replace(/Explanation:/i, '').trim();
+    const fix = parts[1] ? parts[1].trim() : '';
+    
+    res.json({ explanation, fix });
   } catch (error) {
     console.error('OpenAI or DB error:', error);
     res.status(500).json({ error: 'Failed to analyze error' });
