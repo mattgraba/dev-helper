@@ -2,13 +2,20 @@
   "name": "dev-helper-ai",
   "version": "1.0.0",
   "bin": {
-    "dev-helper": "./cli.js"
+    "dev-helper": "./bin/dev-helper.js"
   },
+  "scripts": {
+  "dev:cli": "node cli/cli.js",
+  "dev:server": "nodemon server/src/index.js"
+  },
+
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.10.0",
     "chalk": "^4.1.2",
     "commander": "^14.0.0",
+    "fast-glob": "^3.3.3",
+    "ignore": "^7.0.5",
     "react-redux": "^9.2.0"
   }
 }
