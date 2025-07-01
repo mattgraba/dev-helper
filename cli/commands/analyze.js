@@ -5,6 +5,7 @@ const chalk = require('chalk');
 const handleWithContext = require('../utils/contextHandlerWrapper');
 const { scanFiles } = require('../utils/fileScanner');
 
+// Command Definition with Commander
 module.exports = (program) => {
   program
     .command('analyze')

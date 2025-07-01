@@ -32,7 +32,7 @@ function loadGitignore(directory) {
 async function scanFiles({
   directory = ".",
   extensions = ["js", "ts", "json"],
-  maxFileSizeKB = 100,
+  maxFileSizeKB = 20,
   exclude = ["node_modules", ".git", "dist", "build"]
 }) {
   // Match all files with specified extensions

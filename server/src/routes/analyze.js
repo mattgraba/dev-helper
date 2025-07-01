@@ -2,22 +2,19 @@ const express = require('express');
 const router = express.Router();
 const Response = require('../models/Response');
 const { getAIResponse } = require('../services/openaiService');
+const extractExplanationAndFix = require('../utils/extractExplanationAndFix');
 
 router.post('/', async (req, res) => {
-  const { errorText, userId } = req.body;
+  const { errorText, userId, language = 'JavaScript', contextFiles = [] } = req.body;
 
   if (!errorText) return res.status(400).json({ error: 'Missing errorText' });
 
   try {
-    const aiResponse = await getAIResponse(errorText);
+    const aiResponse = await getAIResponse(errorText, language, contextFiles);
 
+    const { explanation, fix } = extractExplanationAndFix(aiResponse);
     // Save to DB
     await Response.create({ prompt: errorText, aiResponse, userId });
-
-    const parts = aiResponse.split(/Fix:/i);
-
-    const explanation = parts[0].replace(/Explanation:/i, '').trim();
-    const fix = parts[1] ? parts[1].trim() : '';
     
     res.json({ explanation, fix });
   } catch (error) {

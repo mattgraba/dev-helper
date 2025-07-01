@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+// ^ shebang line allows the script to be run directly from the terminal
 const { Command } = require('commander');
 const chalk = require('chalk');
 const program = new Command();
@@ -12,6 +12,7 @@ const handleGenerate = require('./commands/generate');
 const handleScaffold = require('./commands/scaffold');
 const handleTerminal = require('./commands/terminal');
 
+// CLI Metadata: defines basic information when a user runs `dev-helper --help`
 program
   .name('dev-helper')
   .description('AI-powered developer assistant CLI')
@@ -25,4 +26,5 @@ handleGenerate(program);
 handleScaffold(program);
 handleTerminal(program);
 
+// Triggers the CLI to interpret the command-line arguments passed by the user (e.g., `dev-helper analyze`)
 program.parse();

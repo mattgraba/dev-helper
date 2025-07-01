@@ -14,7 +14,7 @@ const terminalRoute = require('./routes/terminal');
 const app = express();
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '2mb'})); // increase backend body size limit for testing
 app.use('/history', historyRoute);
 app.use('/scaffold', scaffoldRoute);
 app.use('/generate', generateRoute);
