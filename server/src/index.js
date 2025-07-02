@@ -10,6 +10,7 @@ const generateRoute = require('./routes/generate');
 const explainRoute = require('./routes/explain');
 const fixRoute = require('./routes/fix');
 const terminalRoute = require('./routes/terminal');
+const authRoute = require('./routes/auth');
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use('/generate', generateRoute);
 app.use('/explain', explainRoute);
 app.use('/fix', fixRoute);
 app.use('/terminal', terminalRoute);
+app.use('/auth', authRoute);
 
 
 mongoose.connect(process.env.MONGODB_URI, {
