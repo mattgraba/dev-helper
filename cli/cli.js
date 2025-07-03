@@ -11,6 +11,8 @@ const handleFix = require('./commands/fix');
 const handleGenerate = require('./commands/generate');
 const handleScaffold = require('./commands/scaffold');
 const handleTerminal = require('./commands/terminal');
+const handleLogin = require('./commands/login');
+const handleHistory = require('./commands/history');
 
 // CLI Metadata: defines basic information when a user runs `dev-helper --help`
 program
@@ -25,6 +27,8 @@ handleFix(program);
 handleGenerate(program);
 handleScaffold(program);
 handleTerminal(program);
+handleLogin(program);
+handleHistory(program);
 
 // Triggers the CLI to interpret the command-line arguments passed by the user (e.g., `dev-helper analyze`)
 program.parse();
