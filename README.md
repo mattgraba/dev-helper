@@ -2,7 +2,7 @@
 
 The Dev Helper AI CLI is a modular, token-authenticated developer assistant that lets you analyze, fix, generate, and scaffold code directly from your terminal using AI. It communicates with a local Express server that proxies requests to OpenAI and stores responses in a MongoDB database.
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### Command Structure
 
@@ -18,7 +18,7 @@ cli/
 │ ├── contextHandlerWrapper.js
 │ ├── fileScanner.js
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### Available Commands
 
@@ -35,7 +35,7 @@ cli/
 
 > All commands (except `login`) require authentication and support a `--context` flag for deeper project-aware results.
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### Context-Aware Mode
 
@@ -47,8 +47,9 @@ scanFiles({
   extensions: ['js', 'ts', 'json'],
   maxFileSizeKB: 100
 })
+```
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### Example Usage
 
@@ -62,7 +63,7 @@ dev-helper fix -f buggyCode.js -o fixedCode.js
 
 dev-helper scaffold -n AgentCard -o client/components/AgentCard.jsx
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### Architecture Overview
 
@@ -89,14 +90,14 @@ Backend (Express)
 
     Returns structured response to CLI
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### Auth File Location
 
 The JWT token is stored securely in: ~/.dev-helper/config.json
 You can clear or reset it by deleting the file.
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+---
 
 ### History Storage
 
