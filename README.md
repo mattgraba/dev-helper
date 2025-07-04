@@ -8,6 +8,7 @@ The Dev Helper AI CLI is a modular, token-authenticated developer assistant that
 
 All CLI commands follow a clean separation of concerns:
 
+```
 cli/
 ├── cli.js # Main CLI entry (Commander)
 ├── commands/
@@ -17,6 +18,7 @@ cli/
 │ ├── getToken.js
 │ ├── contextHandlerWrapper.js
 │ ├── fileScanner.js
+```
 
 ---
 
@@ -67,6 +69,7 @@ dev-helper scaffold -n AgentCard -o client/components/AgentCard.jsx
 
 ### Architecture Overview
 
+```
 CLI Command
    │
    ├──> Handles input, options (commander)
@@ -77,6 +80,7 @@ CLI Command
    ├──> Response printed or written to file
    │
    └──> Token read from ~/.dev-helper/config.json
+```
 
 Backend (Express)
 
@@ -94,12 +98,18 @@ Backend (Express)
 
 ### Auth File Location
 
-The JWT token is stored securely in: ~/.dev-helper/config.json
+The JWT token is stored securely in: 
+```
+~/.dev-helper/config.json
+```
 You can clear or reset it by deleting the file.
 
 ---
 
 ### History Storage
 
-The backend optionally stores past prompt-response pairs in MongoDB. Use: dev-helper history
+The backend optionally stores past prompt-response pairs in MongoDB. Use:
+```
+dev-helper history
+```
 To view saved interactions.
