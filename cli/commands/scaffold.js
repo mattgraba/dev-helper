@@ -8,7 +8,6 @@ const ora = require('ora');
 
 async function handleScaffoldBasic({ name, output }) {
   try {
-
     const spinner = ora(`Sending request to /scaffold for ${name}...`).start();
 
     const res = await axios.post('http://localhost:3001/scaffold', {
@@ -22,13 +21,12 @@ async function handleScaffoldBasic({ name, output }) {
 
     const outPath = output || `client/components/${name}.jsx`;
     const resolvedPath = path.resolve(outPath);
-
     fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
     fs.writeFileSync(resolvedPath, componentCode);
 
     spinner.succeed('Scaffold complete ✅');
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to scaffold component ❌');
+    handleCliError(ora(), err, 'Failed to scaffold component ❌');
   }
 }
 
@@ -54,13 +52,12 @@ async function handleScaffoldWithContext({ name, output }) {
 
     const outPath = output || `client/components/${name}.jsx`;
     const resolvedPath = path.resolve(outPath);
-
     fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
     fs.writeFileSync(resolvedPath, componentCode);
 
     spinner.succeed('Contextual scaffold complete ✅');
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to scaffold component with context ❌');
+    handleCliError(ora(), err, 'Failed to scaffold component with context ❌');
   }
 }
 
@@ -68,3 +65,4 @@ module.exports = {
   handleScaffoldBasic,
   handleScaffoldWithContext,
 };
+

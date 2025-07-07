@@ -9,15 +9,17 @@ const { checkFileExists } = require('../utils/fsUtils');
 
 async function handleAnalyzeBasic({ filePath, language }) {
   try {
-    if (!checkFileExists(filePath)) return;
+    const resolvedPath = path.resolve(filePath);
+    if (!checkFileExists(resolvedPath)) return;
 
-    const code = fs.readFileSync(path.resolve(filePath), 'utf-8');
+    const code = fs.readFileSync(resolvedPath, 'utf-8');
+    const lang = language || 'javascript';  // Default for language
 
     const spinner = ora(`Sending ${filePath} to /analyze...`).start();
       
     const res = await axios.post('http://localhost:3001/analyze', {
       errorText: code,
-      language,
+      language: lang,
     });
 
     spinner.succeed('Analysis complete ✅');
@@ -33,9 +35,11 @@ async function handleAnalyzeBasic({ filePath, language }) {
 
 async function handleAnalyzeWithContext({ filePath, language }) {
   try {
-    if (!checkFileExists(filePath)) return;
+    const resolvedPath = path.resolve(filePath);
+    if (!checkFileExists(resolvedPath)) return;
     
-    const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
+    const mainCode = fs.readFileSync(resolvedPath, 'utf-8');
+    const lang = language || 'javascript';
 
     const contextFiles = await scanFiles({
       directory: process.cwd(),
@@ -47,7 +51,7 @@ async function handleAnalyzeWithContext({ filePath, language }) {
 
     const res = await axios.post('http://localhost:3001/analyze', {
       errorText: mainCode,
-      language,
+      language: lang,
       contextFiles,
     });
 

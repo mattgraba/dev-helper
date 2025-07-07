@@ -7,17 +7,19 @@ const { scanFiles } = require('../utils/fileScanner');
 const handleCliError = require('../utils/errorHandler');
 const { checkFileExists } = require('../utils/fsUtils');
 
-async function handleFixBasic({ file: filePath, language, output }) {
+async function handleFixBasic({ filePath, language, output }) {
   try {
-    if (!checkFileExists(filePath)) return;
+    const resolvedPath = path.resolve(filePath);
+    if (!checkFileExists(resolvedPath)) return;
 
-    const code = fs.readFileSync(path.resolve(filePath), 'utf-8');
+    const code = fs.readFileSync(resolvedPath, 'utf-8');
+    const lang = language?.toLowerCase?.() || 'javascript';
 
     const spinner = ora(`Sending ${filePath} to /fix...`).start();
 
     const res = await axios.post('http://localhost:3001/fix', {
       codeSnippet: code,
-      language,
+      language: lang,
     });
 
     let { fixedCode } = res.data;
@@ -25,23 +27,24 @@ async function handleFixBasic({ file: filePath, language, output }) {
 
     fixedCode = fixedCode.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
 
-    const outPath = output ? path.resolve(output) : path.resolve(filePath);
+    const outPath = output ? path.resolve(output) : resolvedPath;
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
     fs.writeFileSync(outPath, fixedCode);
 
     console.log(chalk.green(`✅ Fixed code written to ${output || filePath}`));
     spinner.succeed('Fix complete ✅');
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to fix code ❌');
+    handleCliError(ora(), err, 'Failed to fix code ❌');
   }
 }
 
-async function handleFixWithContext({ file: filePath, language, output }) {
-  const spinner = ora(`Sending ${filePath} with context to /fix...`).start();
+async function handleFixWithContext({ filePath, language, output }) {
+  const resolvedPath = path.resolve(filePath);
+  if (!checkFileExists(resolvedPath)) return;
+
   try {
-    if (!checkFileExists(filePath)) return;
-    
-    const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
+    const mainCode = fs.readFileSync(resolvedPath, 'utf-8');
+    const lang = language?.toLowerCase?.() || 'javascript';
 
     const contextFiles = await scanFiles({
       directory: process.cwd(),
@@ -49,9 +52,11 @@ async function handleFixWithContext({ file: filePath, language, output }) {
       maxFileSizeKB: 100,
     });
 
+    const spinner = ora(`Sending ${filePath} with context to /fix...`).start();
+
     const res = await axios.post('http://localhost:3001/fix', {
       codeSnippet: mainCode,
-      language,
+      language: lang,
       contextFiles,
     });
 
@@ -60,14 +65,14 @@ async function handleFixWithContext({ file: filePath, language, output }) {
 
     fixedCode = fixedCode.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
 
-    const outPath = output ? path.resolve(output) : path.resolve(filePath);
+    const outPath = output ? path.resolve(output) : resolvedPath;
     fs.mkdirSync(path.dirname(outPath), { recursive: true });
     fs.writeFileSync(outPath, fixedCode);
 
     console.log(chalk.green(`✅ Fixed code written to ${output || filePath}`));
     spinner.succeed('Contextual fix complete ✅');
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to fix code with context ❌');
+    handleCliError(ora(), err, 'Failed to fix code with context ❌');
   }
 }
 
@@ -75,3 +80,4 @@ module.exports = {
   handleFixBasic,
   handleFixWithContext,
 };
+

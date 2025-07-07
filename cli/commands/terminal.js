@@ -4,15 +4,11 @@ const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
 const handleCliError = require('../utils/errorHandler');
 
-async function handleTerminalBasic({ goal, context }) {
+async function handleTerminalBasic({ goal }) {
   try {
-
     const spinner = ora('Sending request to /terminal...').start();
 
-    const res = await axios.post('http://localhost:3001/terminal', {
-      goal,
-      context,
-    });
+    const res = await axios.post('http://localhost:3001/terminal', { goal });
 
     let { commands } = res.data;
     if (!commands) throw new Error('No terminal commands returned from /terminal');
@@ -27,7 +23,7 @@ async function handleTerminalBasic({ goal, context }) {
   }
 }
 
-async function handleTerminalWithContext({ goal, context }) {
+async function handleTerminalWithContext({ goal }) {
   try {
     const contextFiles = await scanFiles({
       directory: process.cwd(),
@@ -39,7 +35,6 @@ async function handleTerminalWithContext({ goal, context }) {
 
     const res = await axios.post('http://localhost:3001/terminal', {
       goal,
-      context,
       contextFiles,
     });
 

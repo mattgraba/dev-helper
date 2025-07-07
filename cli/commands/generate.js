@@ -8,12 +8,13 @@ const handleCliError = require('../utils/errorHandler');
 
 async function handleGenerateBasic({ description, language, fileType, output }) {
   try {
+    const lang = language?.toLowerCase?.() || 'javascript';
 
     const spinner = ora('Sending request to /generate...').start();
 
     const res = await axios.post('http://localhost:3001/generate', {
       description,
-      language,
+      language: lang,
       fileType,
     });
 
@@ -31,19 +32,17 @@ async function handleGenerateBasic({ description, language, fileType, output }) 
       console.log(chalk.yellow('\nNo output path provided. Here is the code:\n'));
       console.log(result);
     }
+
     spinner.succeed('Generation complete ✅');
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to generate code ❌');
+    handleCliError(ora(), err, 'Failed to generate code ❌');
   }
 }
 
 async function handleGenerateWithContext({ description, language, fileType, output }) {
   try {
-    if (!fs.existsSync(filePath)) {
-      console.error(chalk.red(`❌ File not found: ${filePath}`));
-      return;
-    }
-    
+    const lang = language?.toLowerCase?.() || 'javascript';
+
     const contextFiles = await scanFiles({
       directory: process.cwd(),
       extensions: ['js', 'ts', 'json'],
@@ -54,7 +53,7 @@ async function handleGenerateWithContext({ description, language, fileType, outp
 
     const res = await axios.post('http://localhost:3001/generate', {
       description,
-      language,
+      language: lang,
       fileType,
       contextFiles,
     });
@@ -73,9 +72,10 @@ async function handleGenerateWithContext({ description, language, fileType, outp
       console.log(chalk.yellow('\nNo output path provided. Here is the code:\n'));
       console.log(result);
     }
+
     spinner.succeed('Contextual generation complete ✅');
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to generate code with context ❌');
+    handleCliError(ora(), err, 'Failed to generate code with context ❌');
   }
 }
 
@@ -83,3 +83,4 @@ module.exports = {
   handleGenerateBasic,
   handleGenerateWithContext,
 };
+
