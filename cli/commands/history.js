@@ -1,3 +1,4 @@
+// cli/commands/history.js
 const axios = require('axios');
 const getToken = require('../utils/getToken');
 const ora = require('ora');
@@ -11,10 +12,9 @@ module.exports = async function showHistory() {
     return;
   }
 
+  const spinner = ora('Fetching history from /history...').start();
+
   try {
-
-    const spinner = ora('Fetching history from /history...').start();
-
     const response = await axios.get('http://localhost:3001/history', {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -24,11 +24,12 @@ module.exports = async function showHistory() {
     const history = response.data.history;
 
     if (!history.length) {
+      spinner.stop();
       console.log('📭 No history found.');
       return;
     }
 
-    console.log(`📜 Showing ${history.length} saved responses:\n`);
+    spinner.succeed(`📜 Showing ${history.length} saved responses:\n`);
     history.forEach((entry, index) => {
       console.log(`--- Entry ${index + 1} ---`);
       console.log(`🕒 ${entry.createdAt}`);
@@ -36,8 +37,8 @@ module.exports = async function showHistory() {
       console.log(`🤖 Response: ${entry.response}`);
       console.log();
     });
-    spinner.succeed('History fetched ✅');
   } catch (err) {
     handleCliError(spinner, err, 'Failed to fetch history ❌');
   }
 };
+

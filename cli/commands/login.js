@@ -1,4 +1,4 @@
-// cli/commands/loginCommand.js
+// cli/commands/login.js
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -18,11 +18,11 @@ async function login() {
 
   const ask = (q) => new Promise((res) => rl.question(q, res));
 
+  let spinner;
   try {
     const userId = await ask('Enter your user ID: ');
-    rl.close();
 
-    const spinner = ora('Logging in...').start();
+    spinner = ora('Logging in...').start();
 
     const response = await axios.post('http://localhost:3000/auth/login', {
       userId,
@@ -30,16 +30,15 @@ async function login() {
 
     const { token } = response.data;
 
-    // Make sure config directory exists
     if (!fs.existsSync(CONFIG_DIR)) {
       fs.mkdirSync(CONFIG_DIR);
     }
 
-    // Save the token
     fs.writeFileSync(CONFIG_FILE, JSON.stringify({ token }, null, 2));
     spinner.succeed('Login successful. Token saved.');
   } catch (err) {
     handleCliError(spinner, err, 'Login failed ❌');
+  } finally {
     rl.close();
   }
 }
