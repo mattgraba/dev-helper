@@ -28,6 +28,7 @@ async function handleAnalyzeBasic({ filePath, language }) {
     } else {
       console.error(chalk.red('Unexpected error:'), err.message);
     }
+    spinner.fail('Failed to generate analyze command ❌');
   }
 }
 
@@ -61,6 +62,7 @@ async function handleAnalyzeWithContext({ filePath, language }) {
     } else {
       console.error(chalk.red('Unexpected error:'), err.message);
     }
+    spinner.fail('Failed to generate analyze command with context ❌');
   }
 }
 

@@ -3,10 +3,12 @@ const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
 const { scanFiles } = require('../utils/fileScanner');
+const ora = require('ora');
 
 async function handleScaffoldBasic({ name, output }) {
   try {
-    console.log(chalk.cyan(`🚀 Sending request to /scaffold for ${name}...`));
+
+    const spinner = ora(`Sending request to /scaffold for ${name}...`).start();
 
     const res = await axios.post('http://localhost:3001/scaffold', {
       goal: `Create a ${name} component`,
@@ -23,10 +25,14 @@ async function handleScaffoldBasic({ name, output }) {
     fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
     fs.writeFileSync(resolvedPath, componentCode);
 
-    console.log(chalk.green(`✅ Scaffolded component saved to ${outPath}`));
+    spinner.succeed('Scaffold complete ✅');
   } catch (err) {
-    console.error(chalk.red('❌ Failed to scaffold component.'));
-    console.error(err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error(chalk.red('Error from server:'), err.response.data.message);
+    } else {
+      console.error(chalk.red('Unexpected error:'), err.message);
+    }
+    spinner.fail('Failed to scaffold component ❌');
   }
 }
 
@@ -38,7 +44,7 @@ async function handleScaffoldWithContext({ name, output }) {
       maxFileSizeKB: 100,
     });
 
-    console.log(chalk.cyan(`🚀 Sending contextual request to /scaffold for ${name}...`));
+    const spinner = ora(`Sending contextual request to /scaffold for ${name}...`).start();
 
     const res = await axios.post('http://localhost:3001/scaffold', {
       goal: `Create a ${name} component`,
@@ -56,10 +62,14 @@ async function handleScaffoldWithContext({ name, output }) {
     fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
     fs.writeFileSync(resolvedPath, componentCode);
 
-    console.log(chalk.green(`✅ Scaffolded component with context saved to ${outPath}`));
+    spinner.succeed('Contextual scaffold complete ✅');
   } catch (err) {
-    console.error(chalk.red('❌ Failed to scaffold component with context.'));
-    console.error(err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error(chalk.red('Error from server:'), err.response.data.message);
+    } else {
+      console.error(chalk.red('Unexpected error:'), err.message);
+    }
+    spinner.fail('Failed to scaffold component with context ❌');
   }
 }
 

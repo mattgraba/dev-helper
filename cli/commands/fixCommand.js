@@ -2,11 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
+const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
 
 async function handleFixBasic({ file: filePath, language, output }) {
   try {
     const code = fs.readFileSync(path.resolve(filePath), 'utf-8');
+
+    const spinner = ora(`Sending ${filePath} to /fix...`).start();
 
     const res = await axios.post('http://localhost:3001/fix', {
       codeSnippet: code,
@@ -23,13 +26,19 @@ async function handleFixBasic({ file: filePath, language, output }) {
     fs.writeFileSync(outPath, fixedCode);
 
     console.log(chalk.green(`✅ Fixed code written to ${output || filePath}`));
+    spinner.succeed('Fix complete ✅');
   } catch (err) {
-    console.error(chalk.red('❌ Failed to fix code.'));
-    console.error(err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error(chalk.red('Error from server:'), err.response.data.message);
+    } else {
+      console.error(chalk.red('Unexpected error:'), err.message);
+    }
+    spinner.fail('Failed to fix code ❌');
   }
 }
 
 async function handleFixWithContext({ file: filePath, language, output }) {
+  const spinner = ora(`Sending ${filePath} with context to /fix...`).start();
   try {
     const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
@@ -55,9 +64,14 @@ async function handleFixWithContext({ file: filePath, language, output }) {
     fs.writeFileSync(outPath, fixedCode);
 
     console.log(chalk.green(`✅ Fixed code written to ${output || filePath}`));
+    spinner.succeed('Contextual fix complete ✅');
   } catch (err) {
-    console.error(chalk.red('❌ Failed to fix code with context.'));
-    console.error(err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error(chalk.red('Error from server:'), err.response.data.message);
+    } else {
+      console.error(chalk.red('Unexpected error:'), err.message);
+    }
+    spinner.fail('Failed to fix code with context ❌');
   }
 }
 

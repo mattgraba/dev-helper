@@ -26,6 +26,8 @@ async function handleExplainBasic({ file: filePath, language }) {
     } else {
       console.error(chalk.red('Unexpected error:'), err.message);
     }
+    spinner.fail('Failed to generate explain command ❌');
+
   }
 }
 
@@ -57,6 +59,7 @@ async function handleExplainWithContext({ file: filePath, language }) {
     } else {
       console.error(chalk.red('Unexpected error:'), err.message);
     }
+    spinner.fail('Failed to generate explain command with context ❌');
   }
 }
 

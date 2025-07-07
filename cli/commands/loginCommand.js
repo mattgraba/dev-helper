@@ -4,6 +4,7 @@ const path = require('path');
 const os = require('os');
 const readline = require('readline');
 const axios = require('axios');
+const ora = require('ora');
 
 const CONFIG_DIR = path.join(os.homedir(), '.dev-helper');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
@@ -20,6 +21,8 @@ async function login() {
     const userId = await ask('Enter your user ID: ');
     rl.close();
 
+    const spinner = ora('Logging in...').start();
+
     const response = await axios.post('http://localhost:3000/auth/login', {
       userId,
     });
@@ -33,9 +36,14 @@ async function login() {
 
     // Save the token
     fs.writeFileSync(CONFIG_FILE, JSON.stringify({ token }, null, 2));
-    console.log('✅ Login successful. Token saved.');
+    spinner.succeed('Login successful. Token saved.');
   } catch (err) {
-    console.error('❌ Login failed:', err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error('Error from server:', err.response.data.message);
+    } else {
+      console.error('Unexpected error:', err.message);
+    }
+    spinner.fail('Login failed ❌');
     rl.close();
   }
 }

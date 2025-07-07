@@ -2,11 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
+const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
 
 async function handleGenerateBasic({ description, language, fileType, output }) {
   try {
-    console.log(chalk.cyan('🚀 Sending request to /generate...'));
+
+    const spinner = ora('Sending request to /generate...').start();
 
     const res = await axios.post('http://localhost:3001/generate', {
       description,
@@ -28,9 +30,14 @@ async function handleGenerateBasic({ description, language, fileType, output }) 
       console.log(chalk.yellow('\nNo output path provided. Here is the code:\n'));
       console.log(result);
     }
+    spinner.succeed('Generation complete ✅');
   } catch (err) {
-    console.error(chalk.red('❌ Failed to generate code.'));
-    console.error(err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error(chalk.red('Error from server:'), err.response.data.message);
+    } else {
+      console.error(chalk.red('Unexpected error:'), err.message);
+    }
+    spinner.fail('Failed to generate code ❌');
   }
 }
 
@@ -41,6 +48,8 @@ async function handleGenerateWithContext({ description, language, fileType, outp
       extensions: ['js', 'ts', 'json'],
       maxFileSizeKB: 100,
     });
+
+    const spinner = ora('Sending contextual request to /generate...').start();
 
     const res = await axios.post('http://localhost:3001/generate', {
       description,
@@ -63,9 +72,14 @@ async function handleGenerateWithContext({ description, language, fileType, outp
       console.log(chalk.yellow('\nNo output path provided. Here is the code:\n'));
       console.log(result);
     }
+    spinner.succeed('Contextual generation complete ✅');
   } catch (err) {
-    console.error(chalk.red('❌ Failed to generate code with context.'));
-    console.error(err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error(chalk.red('Error from server:'), err.response.data.message);
+    } else {
+      console.error(chalk.red('Unexpected error:'), err.message);
+    }
+    spinner.fail('Failed to generate code with context ❌');
   }
 }
 

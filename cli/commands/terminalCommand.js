@@ -1,9 +1,13 @@
 const axios = require('axios');
 const chalk = require('chalk');
+const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
 
 async function handleTerminalBasic({ goal, context }) {
   try {
+
+    const spinner = ora('Sending request to /terminal...').start();
+
     const res = await axios.post('http://localhost:3001/terminal', {
       goal,
       context,
@@ -16,9 +20,14 @@ async function handleTerminalBasic({ goal, context }) {
 
     console.log(chalk.green('\n💻 Suggested terminal commands:\n'));
     console.log(commands);
+    spinner.succeed('Terminal command generation complete ✅');
   } catch (err) {
-    console.error(chalk.red('❌ Failed to generate terminal commands.'));
-    console.error(err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error(chalk.red('Error from server:'), err.response.data.message);
+    } else {
+      console.error(chalk.red('Unexpected error:'), err.message);
+    }
+    spinner.fail('Failed to generate terminal commands ❌');
   }
 }
 
@@ -29,6 +38,8 @@ async function handleTerminalWithContext({ goal, context }) {
       extensions: ['js', 'ts', 'json'],
       maxFileSizeKB: 100,
     });
+
+    const spinner = ora('Sending contextual request to /terminal...').start();
 
     const res = await axios.post('http://localhost:3001/terminal', {
       goal,
@@ -43,9 +54,14 @@ async function handleTerminalWithContext({ goal, context }) {
 
     console.log(chalk.green('\n💻 Suggested terminal commands with project context:\n'));
     console.log(commands);
+    spinner.succeed('Contextual terminal command generation complete ✅');
   } catch (err) {
-    console.error(chalk.red('❌ Failed to generate terminal commands with context.'));
-    console.error(err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error(chalk.red('Error from server:'), err.response.data.message);
+    } else {
+      console.error(chalk.red('Unexpected error:'), err.message);
+    }
+    spinner.fail('Failed to generate terminal commands with context ❌');
   }
 }
 
