@@ -1,64 +1,18 @@
-const fs = require('fs');
-const path = require('path');
-const axios = require('axios');
-const chalk = require('chalk');
-const ora = require('ora');
-const { scanFiles } = require('../utils/fileScanner');
-const handleCliError = require('../utils/errorHandler');
+const handleWithContext = require('../utils/contextHandlerWrapper');
+const explainCommand = require('./explainCommand');
 
-async function handleExplainBasic({ file: filePath, language }) {
-  try {
-    const code = fs.readFileSync(path.resolve(filePath), 'utf-8');
-
-    const spinner = ora(`Sending ${filePath} to /analyze...`).start();
-
-    const res = await axios.post('http://localhost:3001/explain', {
-      codeSnippet: code,
-      language,
+module.exports = (program) => {
+  program
+    .command('explain')
+    .description('Explain a code file with optional project context')
+    .option('--context', 'Include project context')
+    .requiredOption('--filePath <filePath>', 'Path to the main file')
+    .option('--language <language>', 'Programming language')
+    .action((options) => {
+      handleWithContext({
+        options,
+        handleBasic: explainCommand.handleExplainBasic,
+        handleWithContext: explainCommand.handleExplainWithContext,
+      });
     });
-
-    spinner.succeed('Analysis complete ✅');
-
-    console.log(chalk.green('\n🧠 Explanation:\n'));
-    console.log(res.data.explanation);
-  } catch (err) {
-    handleCliError(spinner, err, 'Failed to generate explain command ❌');
-  }
-}
-
-async function handleExplainWithContext({ file: filePath, language }) {
-  try {
-    if (!fs.existsSync(filePath)) {
-      console.error(chalk.red(`❌ File not found: ${filePath}`));
-      return;
-    }
-
-    const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
-
-    const contextFiles = await scanFiles({
-      directory: process.cwd(),
-      extensions: ['js', 'ts', 'json'],
-      maxFileSizeKB: 100,
-    });
-
-    const spinner = ora(`Sending ${filePath} to /analyze...`).start();
-
-    const res = await axios.post('http://localhost:3001/explain', {
-      codeSnippet: mainCode,
-      language,
-      contextFiles,
-    });
-
-    spinner.succeed('Analysis complete ✅');
-
-    console.log(chalk.green('\n🧠 Explanation:\n'));
-    console.log(res.data.explanation);
-  } catch (err) {
-    handleCliError(spinner, err, 'Failed to generate explain command with context ❌');
-  }
-}
-
-module.exports = {
-  handleExplainBasic,
-  handleExplainWithContext,
 };

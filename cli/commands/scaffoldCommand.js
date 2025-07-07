@@ -1,70 +1,18 @@
-const fs = require('fs');
-const path = require('path');
-const axios = require('axios');
-const chalk = require('chalk');
-const { scanFiles } = require('../utils/fileScanner');
-const handleCliError = require('../utils/errorHandler');
-const ora = require('ora');
+const handleWithContext = require('../utils/contextHandlerWrapper');
+const scaffoldCommand = require('./scaffoldCommand');
 
-async function handleScaffoldBasic({ name, output }) {
-  try {
-
-    const spinner = ora(`Sending request to /scaffold for ${name}...`).start();
-
-    const res = await axios.post('http://localhost:3001/scaffold', {
-      goal: `Create a ${name} component`,
+module.exports = (program) => {
+  program
+    .command('scaffold')
+    .description('Scaffold a new component using AI')
+    .requiredOption('-n, --name <ComponentName>', 'Name of the component to scaffold')
+    .option('-o, --output <path>', 'Output path (e.g. client/components/AgentCard.jsx)')
+    .option('--context', 'Include project context')
+    .action((options) => {
+      handleWithContext({
+        options,
+        handleBasic: scaffoldCommand.handleScaffoldBasic,
+        handleWithContext: scaffoldCommand.handleScaffoldWithContext,
+      });
     });
-
-    let { componentCode } = res.data;
-    if (!componentCode) throw new Error('No component code returned from /scaffold.');
-
-    componentCode = componentCode.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
-
-    const outPath = output || `client/components/${name}.jsx`;
-    const resolvedPath = path.resolve(outPath);
-
-    fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
-    fs.writeFileSync(resolvedPath, componentCode);
-
-    spinner.succeed('Scaffold complete ✅');
-  } catch (err) {
-    handleCliError(spinner, err, 'Failed to scaffold component ❌');
-  }
-}
-
-async function handleScaffoldWithContext({ name, output }) {
-  try {
-    const contextFiles = await scanFiles({
-      directory: process.cwd(),
-      extensions: ['js', 'ts', 'json'],
-      maxFileSizeKB: 100,
-    });
-
-    const spinner = ora(`Sending contextual request to /scaffold for ${name}...`).start();
-
-    const res = await axios.post('http://localhost:3001/scaffold', {
-      goal: `Create a ${name} component`,
-      contextFiles,
-    });
-
-    let { componentCode } = res.data;
-    if (!componentCode) throw new Error('No component code returned from /scaffold.');
-
-    componentCode = componentCode.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
-
-    const outPath = output || `client/components/${name}.jsx`;
-    const resolvedPath = path.resolve(outPath);
-
-    fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
-    fs.writeFileSync(resolvedPath, componentCode);
-
-    spinner.succeed('Contextual scaffold complete ✅');
-  } catch (err) {
-    handleCliError(spinner, err, 'Failed to scaffold component with context ❌');
-  }
-}
-
-module.exports = {
-  handleScaffoldBasic,
-  handleScaffoldWithContext,
 };

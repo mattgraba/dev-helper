@@ -1,18 +1,68 @@
-const handleWithContext = require('../utils/contextHandlerWrapper');
-const analyzeCommand = require('./analyzeCommand');
+const fs = require('fs');
+const path = require('path');
+const axios = require('axios');
+const chalk = require('chalk');
+const ora = require('ora');
+const { scanFiles } = require('../utils/fileScanner');
+const handleCliError = require('../utils/errorHandler');
 
-module.exports = (program) => {
-  program
-    .command('analyze')
-    .description('Analyze a buggy code file and receive an explanation and suggested fix')
-    .option('--context', 'Include project context')
-    .requiredOption('--filePath <filePath>', 'Path to the main file to analyze')
-    .option('--language <language>', 'Programming language')
-    .action((options) => {
-      handleWithContext({
-        options,
-        handleBasic: analyzeCommand.handleAnalyzeBasic,
-        handleWithContext: analyzeCommand.handleAnalyzeWithContext,
-      });
+async function handleAnalyzeBasic({ filePath, language }) {
+  try {
+    const code = fs.readFileSync(path.resolve(filePath), 'utf-8');
+
+    const spinner = ora(`Sending ${filePath} to /analyze...`).start();
+      
+    const res = await axios.post('http://localhost:3001/analyze', {
+      errorText: code,
+      language,
     });
+
+    spinner.succeed('Analysis complete ✅');
+
+    const { explanation, fix } = res.data;
+
+    console.log(chalk.green('\n🧠 Explanation:\n'), explanation);
+    console.log(chalk.green('\n🛠 Suggested Fix:\n'), fix);
+  } catch (err) {
+    handleCliError(spinner, err, 'Failed to generate analyze command ❌');
+  }
+}
+
+async function handleAnalyzeWithContext({ filePath, language }) {
+  try {
+    if (!fs.existsSync(filePath)) {
+      console.error(chalk.red(`❌ File not found: ${filePath}`));
+      return;
+    }
+    
+    const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
+
+    const contextFiles = await scanFiles({
+      directory: process.cwd(),
+      extensions: ['js', 'ts', 'json'],
+      maxFileSizeKB: 100,
+    });
+
+    const spinner = ora(`Sending ${filePath} with context to /analyze...`).start();
+
+    const res = await axios.post('http://localhost:3001/analyze', {
+      errorText: mainCode,
+      language,
+      contextFiles,
+    });
+
+    spinner.succeed('Contextual analysis complete ✅');
+
+    const { explanation, fix } = res.data;
+
+    console.log(chalk.green('\n🧠 Explanation:\n'), explanation);
+    console.log(chalk.green('\n🛠 Suggested Fix:\n'), fix);
+  } catch (err) {
+    handleCliError(spinner, err, 'Failed to generate analyze command with context ❌');
+  }
+}
+
+module.exports = {
+  handleAnalyzeBasic,
+  handleAnalyzeWithContext,
 };
