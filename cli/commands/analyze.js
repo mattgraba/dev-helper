@@ -5,13 +5,11 @@ const chalk = require('chalk');
 const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
 const handleCliError = require('../utils/errorHandler');
+const { checkFileExists } = require('../utils/fsUtils');
 
 async function handleAnalyzeBasic({ filePath, language }) {
   try {
-    if (!fs.existsSync(filePath)) {
-      console.error(chalk.red(`❌ File not found: ${filePath}`));
-      return;
-    }
+    if (!checkFileExists(filePath)) return;
 
     const code = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
@@ -35,10 +33,7 @@ async function handleAnalyzeBasic({ filePath, language }) {
 
 async function handleAnalyzeWithContext({ filePath, language }) {
   try {
-    if (!fs.existsSync(filePath)) {
-      console.error(chalk.red(`❌ File not found: ${filePath}`));
-      return;
-    }
+    if (!checkFileExists(filePath)) return;
     
     const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
