@@ -1,5 +1,8 @@
 const handleWithContext = require('../utils/contextHandlerWrapper');
-const scaffoldCommand = require('./scaffoldCommand');
+const {
+  handleScaffoldBasic,
+  handleScaffoldWithContext,
+} = require('./scaffoldHandlers');
 
 module.exports = (program) => {
   program
@@ -11,8 +14,8 @@ module.exports = (program) => {
     .action((options) => {
       handleWithContext({
         options,
-        handleBasic: scaffoldCommand.handleScaffoldBasic,
-        handleWithContext: scaffoldCommand.handleScaffoldWithContext,
+        handleBasic: handleScaffoldBasic,
+        handleWithContext: handleScaffoldWithContext,
       });
     });
 };

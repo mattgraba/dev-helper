@@ -1,5 +1,5 @@
+const { handleGenerateBasic, handleGenerateWithContext } = require('./generateHandlers');
 const handleWithContext = require('../utils/contextHandlerWrapper');
-const generateCommand = require('./generateCommand');
 
 module.exports = (program) => {
   program
@@ -13,8 +13,8 @@ module.exports = (program) => {
     .action((options) => {
       handleWithContext({
         options,
-        handleBasic: generateCommand.handleGenerateBasic,
-        handleWithContext: generateCommand.handleGenerateWithContext,
+        handleBasic: handleGenerateBasic,
+        handleWithContext: handleGenerateWithContext,
       });
     });
 };

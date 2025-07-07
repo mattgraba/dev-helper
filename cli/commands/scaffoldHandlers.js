@@ -4,12 +4,11 @@ const axios = require('axios');
 const chalk = require('chalk');
 const { scanFiles } = require('../utils/fileScanner');
 const handleCliError = require('../utils/errorHandler');
-const ora = require('ora');
+const ora = require('ora').default;
 
 async function handleScaffoldBasic({ name, output }) {
+  const spinner = ora(`Sending request to /scaffold for ${name}...`).start();
   try {
-    const spinner = ora(`Sending request to /scaffold for ${name}...`).start();
-
     const res = await axios.post('http://localhost:3001/scaffold', {
       goal: `Create a ${name} component`,
     });
@@ -26,19 +25,18 @@ async function handleScaffoldBasic({ name, output }) {
 
     spinner.succeed('Scaffold complete ✅');
   } catch (err) {
-    handleCliError(ora(), err, 'Failed to scaffold component ❌');
+    handleCliError(spinner, err, 'Failed to scaffold component ❌');
   }
 }
 
 async function handleScaffoldWithContext({ name, output }) {
+  const spinner = ora(`Sending contextual request to /scaffold for ${name}...`).start();
   try {
     const contextFiles = await scanFiles({
       directory: process.cwd(),
       extensions: ['js', 'ts', 'json'],
       maxFileSizeKB: 100,
     });
-
-    const spinner = ora(`Sending contextual request to /scaffold for ${name}...`).start();
 
     const res = await axios.post('http://localhost:3001/scaffold', {
       goal: `Create a ${name} component`,
@@ -57,7 +55,7 @@ async function handleScaffoldWithContext({ name, output }) {
 
     spinner.succeed('Contextual scaffold complete ✅');
   } catch (err) {
-    handleCliError(ora(), err, 'Failed to scaffold component with context ❌');
+    handleCliError(spinner, err, 'Failed to scaffold component with context ❌');
   }
 }
 

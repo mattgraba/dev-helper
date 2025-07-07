@@ -1,5 +1,8 @@
 const handleWithContext = require('../utils/contextHandlerWrapper');
-const terminalCommand = require('./terminalCommand');
+const {
+  handleTerminalBasic,
+  handleTerminalWithContext,
+} = require('./terminalHandlers');
 
 module.exports = (program) => {
   program
@@ -10,8 +13,8 @@ module.exports = (program) => {
     .action((options) => {
       handleWithContext({
         options,
-        handleBasic: terminalCommand.handleTerminalBasic,
-        handleWithContext: terminalCommand.handleTerminalWithContext,
+        handleBasic: handleTerminalBasic,
+        handleWithContext: handleTerminalWithContext,
       });
     });
 };

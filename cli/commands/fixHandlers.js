@@ -2,20 +2,19 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
-const ora = require('ora');
+const ora = require('ora').default;
 const { scanFiles } = require('../utils/fileScanner');
 const handleCliError = require('../utils/errorHandler');
 const { checkFileExists } = require('../utils/fsUtils');
 
 async function handleFixBasic({ filePath, language, output }) {
+  const spinner = ora(`Sending ${filePath} to /fix...`).start();
   try {
     const resolvedPath = path.resolve(filePath);
     if (!checkFileExists(resolvedPath)) return;
 
     const code = fs.readFileSync(resolvedPath, 'utf-8');
     const lang = language?.toLowerCase?.() || 'javascript';
-
-    const spinner = ora(`Sending ${filePath} to /fix...`).start();
 
     const res = await axios.post('http://localhost:3001/fix', {
       codeSnippet: code,
@@ -34,11 +33,12 @@ async function handleFixBasic({ filePath, language, output }) {
     console.log(chalk.green(`✅ Fixed code written to ${output || filePath}`));
     spinner.succeed('Fix complete ✅');
   } catch (err) {
-    handleCliError(ora(), err, 'Failed to fix code ❌');
+    handleCliError(spinner, err, 'Failed to fix code ❌');
   }
 }
 
 async function handleFixWithContext({ filePath, language, output }) {
+  const spinner = ora(`Sending ${filePath} with context to /fix...`).start();
   const resolvedPath = path.resolve(filePath);
   if (!checkFileExists(resolvedPath)) return;
 
@@ -51,8 +51,6 @@ async function handleFixWithContext({ filePath, language, output }) {
       extensions: ['js', 'ts', 'json'],
       maxFileSizeKB: 100,
     });
-
-    const spinner = ora(`Sending ${filePath} with context to /fix...`).start();
 
     const res = await axios.post('http://localhost:3001/fix', {
       codeSnippet: mainCode,
@@ -72,7 +70,7 @@ async function handleFixWithContext({ filePath, language, output }) {
     console.log(chalk.green(`✅ Fixed code written to ${output || filePath}`));
     spinner.succeed('Contextual fix complete ✅');
   } catch (err) {
-    handleCliError(ora(), err, 'Failed to fix code with context ❌');
+    handleCliError(spinner, err, 'Failed to fix code with context ❌');
   }
 }
 

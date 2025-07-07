@@ -1,5 +1,5 @@
+const { handleAnalyzeBasic, handleAnalyzeWithContext } = require('./analyzeHandlers');
 const handleWithContext = require('../utils/contextHandlerWrapper');
-const analyzeCommand = require('./analyzeCommand');
 
 module.exports = (program) => {
   program
@@ -11,8 +11,8 @@ module.exports = (program) => {
     .action((options) => {
       handleWithContext({
         options,
-        handleBasic: analyzeCommand.handleAnalyzeBasic,
-        handleWithContext: analyzeCommand.handleAnalyzeWithContext,
+        handleBasic: handleAnalyzeBasic,
+        handleWithContext: handleAnalyzeWithContext,
       });
     });
 };

@@ -2,15 +2,14 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
-const ora = require('ora');
+const ora = require('ora').default;
 const { scanFiles } = require('../utils/fileScanner');
 const handleCliError = require('../utils/errorHandler');
 
 async function handleGenerateBasic({ description, language, fileType, output }) {
+  const spinner = ora('Sending request to /generate...').start();
   try {
     const lang = language?.toLowerCase?.() || 'javascript';
-
-    const spinner = ora('Sending request to /generate...').start();
 
     const res = await axios.post('http://localhost:3001/generate', {
       description,
@@ -35,11 +34,12 @@ async function handleGenerateBasic({ description, language, fileType, output }) 
 
     spinner.succeed('Generation complete ✅');
   } catch (err) {
-    handleCliError(ora(), err, 'Failed to generate code ❌');
+    handleCliError(spinner, err, 'Failed to generate code ❌');
   }
 }
 
 async function handleGenerateWithContext({ description, language, fileType, output }) {
+  const spinner = ora('Sending contextual request to /generate...').start();
   try {
     const lang = language?.toLowerCase?.() || 'javascript';
 
@@ -48,8 +48,6 @@ async function handleGenerateWithContext({ description, language, fileType, outp
       extensions: ['js', 'ts', 'json'],
       maxFileSizeKB: 100,
     });
-
-    const spinner = ora('Sending contextual request to /generate...').start();
 
     const res = await axios.post('http://localhost:3001/generate', {
       description,
@@ -75,7 +73,7 @@ async function handleGenerateWithContext({ description, language, fileType, outp
 
     spinner.succeed('Contextual generation complete ✅');
   } catch (err) {
-    handleCliError(ora(), err, 'Failed to generate code with context ❌');
+    handleCliError(spinner, err, 'Failed to generate code with context ❌');
   }
 }
 

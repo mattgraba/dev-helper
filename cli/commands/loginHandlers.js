@@ -4,7 +4,7 @@ const path = require('path');
 const os = require('os');
 const readline = require('readline');
 const axios = require('axios');
-const ora = require('ora');
+const ora = require('ora').default;
 const handleCliError = require('../utils/errorHandler');
 
 const CONFIG_DIR = path.join(os.homedir(), '.dev-helper');

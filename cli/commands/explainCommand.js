@@ -1,5 +1,5 @@
+const { handleExplainBasic, handleExplainWithContext } = require('./explainHandlers');
 const handleWithContext = require('../utils/contextHandlerWrapper');
-const explainCommand = require('./explainCommand');
 
 module.exports = (program) => {
   program
@@ -11,8 +11,8 @@ module.exports = (program) => {
     .action((options) => {
       handleWithContext({
         options,
-        handleBasic: explainCommand.handleExplainBasic,
-        handleWithContext: explainCommand.handleExplainWithContext,
+        handleBasic: handleExplainBasic,
+        handleWithContext: handleExplainWithContext,
       });
     });
 };

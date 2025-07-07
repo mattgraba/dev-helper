@@ -1,13 +1,12 @@
 const axios = require('axios');
 const chalk = require('chalk');
-const ora = require('ora');
+const ora = require('ora').default;
 const { scanFiles } = require('../utils/fileScanner');
 const handleCliError = require('../utils/errorHandler');
 
 async function handleTerminalBasic({ goal }) {
+  const spinner = ora('Sending request to /terminal...').start();
   try {
-    const spinner = ora('Sending request to /terminal...').start();
-
     const res = await axios.post('http://localhost:3001/terminal', { goal });
 
     let { commands } = res.data;
@@ -24,14 +23,13 @@ async function handleTerminalBasic({ goal }) {
 }
 
 async function handleTerminalWithContext({ goal }) {
+  const spinner = ora('Sending contextual request to /terminal...').start();
   try {
     const contextFiles = await scanFiles({
       directory: process.cwd(),
       extensions: ['js', 'ts', 'json'],
       maxFileSizeKB: 100,
     });
-
-    const spinner = ora('Sending contextual request to /terminal...').start();
 
     const res = await axios.post('http://localhost:3001/terminal', {
       goal,

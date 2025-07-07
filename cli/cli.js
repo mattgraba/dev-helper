@@ -5,14 +5,14 @@ const chalk = require('chalk');
 const program = new Command();
 
 // Import per-command handlers
-const handleAnalyze = require('./commands/analyze');
-const handleExplain = require('./commands/explain');
-const handleFix = require('./commands/fix');
-const handleGenerate = require('./commands/generate');
-const handleScaffold = require('./commands/scaffold');
-const handleTerminal = require('./commands/terminal');
-const handleLogin = require('./commands/login');
-const handleHistory = require('./commands/history');
+const handleAnalyze = require('./commands/analyzeCommand');
+const handleExplain = require('./commands/explainCommand');
+const handleFix = require('./commands/fixCommand');
+const handleGenerate = require('./commands/generateCommand');
+const handleScaffold = require('./commands/scaffoldCommand');
+const handleTerminal = require('./commands/terminalCommand');
+const handleLogin = require('./commands/loginCommand');
+const handleHistory = require('./commands/historyCommand');
 
 // CLI Metadata: defines basic information when a user runs `dev-helper --help`
 program
@@ -25,10 +25,10 @@ handleAnalyze(program);
 handleExplain(program);
 handleFix(program);
 handleGenerate(program);
+handleHistory(program);
+handleLogin(program);
 handleScaffold(program);
 handleTerminal(program);
-handleLogin(program);
-handleHistory(program);
 
 // Triggers the CLI to interpret the command-line arguments passed by the user (e.g., `dev-helper analyze`)
-program.parse();
+program.parse(process.argv);

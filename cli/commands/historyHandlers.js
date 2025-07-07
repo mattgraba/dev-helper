@@ -1,10 +1,10 @@
 // cli/commands/history.js
 const axios = require('axios');
 const getToken = require('../utils/getToken');
-const ora = require('ora');
+const ora = require('ora').default;
 const handleCliError = require('../utils/errorHandler');
 
-module.exports = async function showHistory() {
+async function showHistory() {
   const token = getToken();
 
   if (!token) {
@@ -40,5 +40,9 @@ module.exports = async function showHistory() {
   } catch (err) {
     handleCliError(spinner, err, 'Failed to fetch history ❌');
   }
+}
+
+module.exports = {
+  showHistory,
 };
 

@@ -2,20 +2,19 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
-const ora = require('ora');
+const ora = require('ora').default;
 const { scanFiles } = require('../utils/fileScanner');
 const handleCliError = require('../utils/errorHandler');
 const { checkFileExists } = require('../utils/fsUtils');
 
 async function handleAnalyzeBasic({ filePath, language }) {
+  const spinner = ora(`Sending ${filePath} to /analyze...`).start();
   try {
     const resolvedPath = path.resolve(filePath);
     if (!checkFileExists(resolvedPath)) return;
 
     const code = fs.readFileSync(resolvedPath, 'utf-8');
     const lang = language || 'javascript';  // Default for language
-
-    const spinner = ora(`Sending ${filePath} to /analyze...`).start();
       
     const res = await axios.post('http://localhost:3001/analyze', {
       errorText: code,
@@ -34,6 +33,7 @@ async function handleAnalyzeBasic({ filePath, language }) {
 }
 
 async function handleAnalyzeWithContext({ filePath, language }) {
+  const spinner = ora(`Sending ${filePath} with context to /analyze...`).start();
   try {
     const resolvedPath = path.resolve(filePath);
     if (!checkFileExists(resolvedPath)) return;
@@ -46,8 +46,6 @@ async function handleAnalyzeWithContext({ filePath, language }) {
       extensions: ['js', 'ts', 'json'],
       maxFileSizeKB: 100,
     });
-
-    const spinner = ora(`Sending ${filePath} with context to /analyze...`).start();
 
     const res = await axios.post('http://localhost:3001/analyze', {
       errorText: mainCode,
