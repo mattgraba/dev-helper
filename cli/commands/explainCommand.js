@@ -2,24 +2,30 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
+const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
 
 async function handleExplainBasic({ file: filePath, language }) {
   try {
     const code = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
-    console.log(chalk.cyan(`📤 Sending ${filePath} to /explain...`));
+    const spinner = ora(`Sending ${filePath} to /analyze...`).start();
 
     const res = await axios.post('http://localhost:3001/explain', {
       codeSnippet: code,
       language,
     });
 
+    spinner.succeed('Analysis complete ✅');
+
     console.log(chalk.green('\n🧠 Explanation:\n'));
     console.log(res.data.explanation);
   } catch (err) {
-    console.error(chalk.red('❌ Failed to explain code.'));
-    console.error(err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error(chalk.red('Error from server:'), err.response.data.message);
+    } else {
+      console.error(chalk.red('Unexpected error:'), err.message);
+    }
   }
 }
 
@@ -33,7 +39,7 @@ async function handleExplainWithContext({ file: filePath, language }) {
       maxFileSizeKB: 100,
     });
 
-    console.log(chalk.cyan(`📤 Sending ${filePath} with context to /explain...`));
+    const spinner = ora(`Sending ${filePath} to /analyze...`).start();
 
     const res = await axios.post('http://localhost:3001/explain', {
       codeSnippet: mainCode,
@@ -41,11 +47,16 @@ async function handleExplainWithContext({ file: filePath, language }) {
       contextFiles,
     });
 
+    spinner.succeed('Analysis complete ✅');
+
     console.log(chalk.green('\n🧠 Explanation:\n'));
     console.log(res.data.explanation);
   } catch (err) {
-    console.error(chalk.red('❌ Failed to explain code with context.'));
-    console.error(err.response?.data || err.message);
+    if (err.response && err.response.data) {
+      console.error(chalk.red('Error from server:'), err.response.data.message);
+    } else {
+      console.error(chalk.red('Unexpected error:'), err.message);
+    }
   }
 }
 
