@@ -8,6 +8,11 @@ const handleCliError = require('../utils/errorHandler');
 
 async function handleAnalyzeBasic({ filePath, language }) {
   try {
+    if (!fs.existsSync(filePath)) {
+      console.error(chalk.red(`❌ File not found: ${filePath}`));
+      return;
+    }
+
     const code = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
     const spinner = ora(`Sending ${filePath} to /analyze...`).start();
