@@ -4,6 +4,7 @@ const axios = require('axios');
 const chalk = require('chalk');
 const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
+const handleCliError = require('../utils/errorHandler');
 
 async function handleFixBasic({ file: filePath, language, output }) {
   try {
@@ -28,18 +29,18 @@ async function handleFixBasic({ file: filePath, language, output }) {
     console.log(chalk.green(`✅ Fixed code written to ${output || filePath}`));
     spinner.succeed('Fix complete ✅');
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to fix code ❌');
+    handleCliError(spinner, err, 'Failed to fix code ❌');
   }
 }
 
 async function handleFixWithContext({ file: filePath, language, output }) {
   const spinner = ora(`Sending ${filePath} with context to /fix...`).start();
   try {
+    if (!fs.existsSync(filePath)) {
+      console.error(chalk.red(`❌ File not found: ${filePath}`));
+      return;
+    }
+    
     const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
     const contextFiles = await scanFiles({
@@ -66,12 +67,7 @@ async function handleFixWithContext({ file: filePath, language, output }) {
     console.log(chalk.green(`✅ Fixed code written to ${output || filePath}`));
     spinner.succeed('Contextual fix complete ✅');
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to fix code with context ❌');
+    handleCliError(spinner, err, 'Failed to fix code with context ❌');
   }
 }
 

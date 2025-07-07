@@ -3,6 +3,7 @@ const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
 const { scanFiles } = require('../utils/fileScanner');
+const handleCliError = require('../utils/errorHandler');
 const ora = require('ora');
 
 async function handleScaffoldBasic({ name, output }) {
@@ -27,12 +28,7 @@ async function handleScaffoldBasic({ name, output }) {
 
     spinner.succeed('Scaffold complete ✅');
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to scaffold component ❌');
+    handleCliError(spinner, err, 'Failed to scaffold component ❌');
   }
 }
 
@@ -64,12 +60,7 @@ async function handleScaffoldWithContext({ name, output }) {
 
     spinner.succeed('Contextual scaffold complete ✅');
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to scaffold component with context ❌');
+    handleCliError(spinner, err, 'Failed to scaffold component with context ❌');
   }
 }
 

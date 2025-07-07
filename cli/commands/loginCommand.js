@@ -5,6 +5,7 @@ const os = require('os');
 const readline = require('readline');
 const axios = require('axios');
 const ora = require('ora');
+const handleCliError = require('../utils/errorHandler');
 
 const CONFIG_DIR = path.join(os.homedir(), '.dev-helper');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
@@ -38,12 +39,7 @@ async function login() {
     fs.writeFileSync(CONFIG_FILE, JSON.stringify({ token }, null, 2));
     spinner.succeed('Login successful. Token saved.');
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error('Error from server:', err.response.data.message);
-    } else {
-      console.error('Unexpected error:', err.message);
-    }
-    spinner.fail('Login failed ❌');
+    handleCliError(spinner, err, 'Login failed ❌');
     rl.close();
   }
 }

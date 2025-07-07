@@ -4,6 +4,7 @@ const axios = require('axios');
 const chalk = require('chalk');
 const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
+const handleCliError = require('../utils/errorHandler');
 
 async function handleAnalyzeBasic({ filePath, language }) {
   try {
@@ -23,17 +24,17 @@ async function handleAnalyzeBasic({ filePath, language }) {
     console.log(chalk.green('\n🧠 Explanation:\n'), explanation);
     console.log(chalk.green('\n🛠 Suggested Fix:\n'), fix);
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to generate analyze command ❌');
+    handleCliError(spinner, err, 'Failed to generate analyze command ❌');
   }
 }
 
 async function handleAnalyzeWithContext({ filePath, language }) {
   try {
+    if (!fs.existsSync(filePath)) {
+      console.error(chalk.red(`❌ File not found: ${filePath}`));
+      return;
+    }
+    
     const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
     const contextFiles = await scanFiles({
@@ -57,12 +58,7 @@ async function handleAnalyzeWithContext({ filePath, language }) {
     console.log(chalk.green('\n🧠 Explanation:\n'), explanation);
     console.log(chalk.green('\n🛠 Suggested Fix:\n'), fix);
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to generate analyze command with context ❌');
+    handleCliError(spinner, err, 'Failed to generate analyze command with context ❌');
   }
 }
 

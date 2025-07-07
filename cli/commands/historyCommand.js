@@ -1,6 +1,7 @@
 const axios = require('axios');
 const getToken = require('../utils/getToken');
 const ora = require('ora');
+const handleCliError = require('../utils/errorHandler');
 
 module.exports = async function showHistory() {
   const token = getToken();
@@ -37,11 +38,6 @@ module.exports = async function showHistory() {
     });
     spinner.succeed('History fetched ✅');
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error('Error from server:', err.response.data.message);
-    } else {
-      console.error('Unexpected error:', err.message);
-    }
-    spinner.fail('Failed to fetch history ❌');
+    handleCliError(spinner, err, 'Failed to fetch history ❌');
   }
 };

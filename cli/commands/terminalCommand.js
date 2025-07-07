@@ -2,6 +2,7 @@ const axios = require('axios');
 const chalk = require('chalk');
 const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
+const handleCliError = require('../utils/errorHandler');
 
 async function handleTerminalBasic({ goal, context }) {
   try {
@@ -22,12 +23,7 @@ async function handleTerminalBasic({ goal, context }) {
     console.log(commands);
     spinner.succeed('Terminal command generation complete ✅');
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to generate terminal commands ❌');
+    handleCliError(spinner, err, 'Failed to generate terminal commands ❌');
   }
 }
 
@@ -56,12 +52,7 @@ async function handleTerminalWithContext({ goal, context }) {
     console.log(commands);
     spinner.succeed('Contextual terminal command generation complete ✅');
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to generate terminal commands with context ❌');
+    handleCliError(spinner, err, 'Failed to generate terminal commands with context ❌');
   }
 }
 

@@ -4,6 +4,7 @@ const axios = require('axios');
 const chalk = require('chalk');
 const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
+const handleCliError = require('../utils/errorHandler');
 
 async function handleGenerateBasic({ description, language, fileType, output }) {
   try {
@@ -32,17 +33,17 @@ async function handleGenerateBasic({ description, language, fileType, output }) 
     }
     spinner.succeed('Generation complete ✅');
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to generate code ❌');
+    handleCliError(spinner, err, 'Failed to generate code ❌');
   }
 }
 
 async function handleGenerateWithContext({ description, language, fileType, output }) {
   try {
+    if (!fs.existsSync(filePath)) {
+      console.error(chalk.red(`❌ File not found: ${filePath}`));
+      return;
+    }
+    
     const contextFiles = await scanFiles({
       directory: process.cwd(),
       extensions: ['js', 'ts', 'json'],
@@ -74,12 +75,7 @@ async function handleGenerateWithContext({ description, language, fileType, outp
     }
     spinner.succeed('Contextual generation complete ✅');
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to generate code with context ❌');
+    handleCliError(spinner, err, 'Failed to generate code with context ❌');
   }
 }
 

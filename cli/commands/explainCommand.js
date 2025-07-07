@@ -4,6 +4,7 @@ const axios = require('axios');
 const chalk = require('chalk');
 const ora = require('ora');
 const { scanFiles } = require('../utils/fileScanner');
+const handleCliError = require('../utils/errorHandler');
 
 async function handleExplainBasic({ file: filePath, language }) {
   try {
@@ -21,18 +22,17 @@ async function handleExplainBasic({ file: filePath, language }) {
     console.log(chalk.green('\n🧠 Explanation:\n'));
     console.log(res.data.explanation);
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to generate explain command ❌');
-
+    handleCliError(spinner, err, 'Failed to generate explain command ❌');
   }
 }
 
 async function handleExplainWithContext({ file: filePath, language }) {
   try {
+    if (!fs.existsSync(filePath)) {
+      console.error(chalk.red(`❌ File not found: ${filePath}`));
+      return;
+    }
+
     const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
     const contextFiles = await scanFiles({
@@ -54,12 +54,7 @@ async function handleExplainWithContext({ file: filePath, language }) {
     console.log(chalk.green('\n🧠 Explanation:\n'));
     console.log(res.data.explanation);
   } catch (err) {
-    if (err.response && err.response.data) {
-      console.error(chalk.red('Error from server:'), err.response.data.message);
-    } else {
-      console.error(chalk.red('Unexpected error:'), err.message);
-    }
-    spinner.fail('Failed to generate explain command with context ❌');
+    handleCliError(spinner, err, 'Failed to generate explain command with context ❌');
   }
 }
 
