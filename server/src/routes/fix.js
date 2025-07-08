@@ -1,11 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const { sendPrompt } = require('../services/openaiService');
+const Response = require('../models/Response');
+const authMiddleware = require('../middleware/authMiddleware');
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   const { codeSnippet, language = 'JavaScript' } = req.body;
 
-  if (!codeSnippet) return res.status(400).json({ error: 'Missing codeSnippet' });
+  if (!codeSnippet) {
+    return res.status(400).json({ error: 'Missing codeSnippet' });
+  }
 
   const prompt = `
 You are an expert software engineer.
@@ -20,8 +24,17 @@ Return only the fixed code with no explanations.
 `;
 
   try {
-    const fixedCode = await sendPrompt(prompt);
-    res.json({ fixedCode });
+    const output = await sendPrompt(prompt);
+
+    // Save to DB like other routes
+    await Response.create({
+      userId: req.user.id,
+      input: codeSnippet,
+      output,
+      timestamp: new Date(),
+    });
+
+    res.json({ input: codeSnippet, output });
   } catch (err) {
     console.error('Fix route error:', err);
     res.status(500).json({ error: 'Failed to generate fixed code' });
