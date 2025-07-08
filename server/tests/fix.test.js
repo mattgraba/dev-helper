@@ -1,13 +1,3 @@
-/**
- * fix.test.js
- * 
- * Integration tests for the /fix route.
- * Covers:
- * - Successful AI fix generation
- * - Authenticated user context
- * - Error handling when OpenAI or DB fails
- */
-
 const request = require('supertest');
 const express = require('express');
 const mongoose = require('mongoose');
@@ -15,15 +5,15 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 const fixRouter = require('../src/routes/fix');
 const Response = require('../src/models/Response');
 
-// --- Mock authMiddleware to inject req.user ---
+// Mock auth middleware
 jest.mock('../src/middleware/authMiddleware', () => (req, res, next) => {
   req.user = { id: 'mock-user-id' };
   next();
 });
 
-// --- Mock OpenAI ---
-jest.mock('../src/lib/openai', () => ({
-  getOpenAIResponse: jest.fn().mockResolvedValue('Fixed code goes here')
+// Mock the correct AI service function your route uses
+jest.mock('../src/services/openaiService', () => ({
+  sendPrompt: jest.fn().mockResolvedValue('Fixed code goes here'),
 }));
 
 const app = express();
@@ -35,8 +25,7 @@ describe('/fix route', () => {
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
-    await mongoose.connect(uri);
+    await mongoose.connect(mongoServer.getUri());
   });
 
   afterAll(async () => {
@@ -48,31 +37,30 @@ describe('/fix route', () => {
     await Response.deleteMany();
   });
 
-  it('returns a fixed version of input code and saves to DB', async () => {
+  it('returns fixedCode and saves record to DB', async () => {
     const res = await request(app)
       .post('/fix')
-      .send({ input: 'function broken() {' });
+      .send({ codeSnippet: 'function broken() {' });
 
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('input', 'function broken() {');
-    expect(res.body).toHaveProperty('output', 'Fixed code goes here');
+    expect(res.body).toHaveProperty('fixedCode', 'Fixed code goes here');
 
-    // Validate DB save
+    // Validate DB save if your route saves to DB, else skip this
     const saved = await Response.findOne({ userId: 'mock-user-id' });
     expect(saved).toBeTruthy();
     expect(saved.input).toBe('function broken() {');
     expect(saved.output).toBe('Fixed code goes here');
   });
 
-  it('returns 500 if OpenAI or DB fails', async () => {
-    const { getOpenAIResponse } = require('../src/lib/openai');
-    getOpenAIResponse.mockRejectedValueOnce(new Error('OpenAI is down'));
+  it('returns 500 if AI or DB fails', async () => {
+    const { sendPrompt } = require('../src/services/openaiService');
+    sendPrompt.mockRejectedValueOnce(new Error('OpenAI failure'));
 
     const res = await request(app)
       .post('/fix')
-      .send({ input: 'broken code' });
+      .send({ codeSnippet: 'broken code' });
 
     expect(res.status).toBe(500);
-    expect(res.body).toHaveProperty('error', 'Failed to fix code');
+    expect(res.body).toHaveProperty('error', 'Failed to generate fixed code');
   });
 });
