@@ -14,7 +14,11 @@ router.post('/', async (req, res) => {
 
     const { explanation, fix } = extractExplanationAndFix(aiResponse);
     // Save to DB
-    await Response.create({ prompt: errorText, aiResponse, userId });
+    await Response.create({
+      input: errorText,                // the text/code to analyze (original prompt)
+      output: aiResponse,              // full AI response or formatted output
+      userId,
+    });
     
     res.json({ explanation, fix });
   } catch (error) {
