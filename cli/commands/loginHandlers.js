@@ -1,4 +1,3 @@
-// cli/commands/login.js
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -24,7 +23,7 @@ async function login() {
 
     spinner = ora('Logging in...').start();
 
-    const response = await axios.post('http://localhost:3000/auth/login', {
+    const response = await axios.post('http://localhost:3001/auth/login', {
       userId,
     });
 

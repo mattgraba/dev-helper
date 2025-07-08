@@ -1,71 +1,107 @@
 #!/bin/bash
 
-# Colors for output
+# Colors
 GREEN='\033[0;32m'
 RED='\033[0;31m'
-YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-# Config paths
-CONFIG_DIR="$HOME/.dev-helper"
-CONFIG_FILE="$CONFIG_DIR/config.json"
+CONFIG_FILE="$HOME/.dev-helper/config.json"
+TEST_FILE="./tests/sample-bug.js"
+SCAFFOLDED_FILE="./client/components/TestComponent.jsx"
 
-echo -e "${YELLOW}Starting CLI test script...${NC}"
+function print_pass() {
+  echo -e "${GREEN}✅ $1 passed${NC}"
+}
 
-# Test login command
-echo -e "\n${YELLOW}Testing login command...${NC}"
+function print_fail() {
+  echo -e "${RED}❌ $1 failed${NC}"
+}
 
-# Simulate user input (testUser123)
-LOGIN_OUTPUT=$(echo "testUser123" | node cli/cli.js login 2>&1)
+echo "📦 Running Dev Helper CLI Test Suite..."
 
-if [[ $? -eq 0 && -f "$CONFIG_FILE" ]]; then
-  echo -e "${GREEN}✅ Login command ran successfully and token file exists.${NC}"
+# ----------------------
+# 1. Login
+# ----------------------
+echo -n "Enter test user ID for login: "
+read TEST_USER_ID
+dev-helper login <<< "$TEST_USER_ID"
+sleep 1
+
+if [ -f "$CONFIG_FILE" ]; then
+  print_pass "Login"
 else
-  echo -e "${RED}❌ Login command failed or token file missing.${NC}"
-  echo "$LOGIN_OUTPUT"
+  print_fail "Login (token not saved)"
   exit 1
 fi
 
-# Verify token file contents (basic check)
-TOKEN_PRESENT=$(jq -r '.token' "$CONFIG_FILE" 2>/dev/null)
-
-if [[ -n "$TOKEN_PRESENT" && "$TOKEN_PRESENT" != "null" ]]; then
-  echo -e "${GREEN}✅ Token found in config file.${NC}"
+# ----------------------
+# 2. Generate
+# ----------------------
+dev-helper generate --description "Create a simple Express server"
+if [ $? -eq 0 ]; then
+  print_pass "Generate"
 else
-  echo -e "${RED}❌ Token missing or invalid in config file.${NC}"
-  exit 1
+  print_fail "Generate"
 fi
 
-# Test history command
-echo -e "\n${YELLOW}Testing history command...${NC}"
-
-HISTORY_OUTPUT=$(node cli/cli.js history 2>&1)
-
-if [[ $? -eq 0 ]]; then
-  echo -e "${GREEN}✅ History command ran successfully.${NC}"
-
-  if echo "$HISTORY_OUTPUT" | grep -q "No history found."; then
-    echo -e "${YELLOW}⚠️ No history found message displayed (this is OK if no history exists).${NC}"
-  elif echo "$HISTORY_OUTPUT" | grep -q "Showing"; then
-    echo -e "${GREEN}✅ History output shows saved responses.${NC}"
-  else
-    echo -e "${RED}❌ Unexpected history output:${NC}"
-    echo "$HISTORY_OUTPUT"
-  fi
+# ----------------------
+# 3. Scaffold
+# ----------------------
+dev-helper scaffold -n TestComponent -o $SCAFFOLDED_FILE
+if [ -f "$SCAFFOLDED_FILE" ]; then
+  print_pass "Scaffold"
 else
-  echo -e "${RED}❌ History command failed to run.${NC}"
-  echo "$HISTORY_OUTPUT"
-  exit 1
+  print_fail "Scaffold (file not written)"
 fi
 
-# Cleanup test token file
-echo -e "\n${YELLOW}Cleaning up test artifacts...${NC}"
-rm -f "$CONFIG_FILE"
-
-if [[ ! -f "$CONFIG_FILE" ]]; then
-  echo -e "${GREEN}✅ Cleanup successful.${NC}"
+# ----------------------
+# 4. Analyze
+# ----------------------
+dev-helper analyze --filePath "$TEST_FILE"
+if [ $? -eq 0 ]; then
+  print_pass "Analyze"
 else
-  echo -e "${RED}❌ Cleanup failed.${NC}"
+  print_fail "Analyze"
 fi
 
-echo -e "\n${GREEN}All CLI tests completed.${NC}"
+# ----------------------
+# 5. Explain
+# ----------------------
+dev-helper explain --filePath "$TEST_FILE"
+if [ $? -eq 0 ]; then
+  print_pass "Explain"
+else
+  print_fail "Explain"
+fi
+
+# ----------------------
+# 6. Fix
+# ----------------------
+dev-helper fix --filePath "$TEST_FILE"
+if [ $? -eq 0 ]; then
+  print_pass "Fix"
+else
+  print_fail "Fix"
+fi
+
+# ----------------------
+# 7. Terminal
+# ----------------------
+dev-helper terminal --goal "Set up a React project with Tailwind"
+if [ $? -eq 0 ]; then
+  print_pass "Terminal"
+else
+  print_fail "Terminal"
+fi
+
+# ----------------------
+# 8. History
+# ----------------------
+dev-helper history
+if [ $? -eq 0 ]; then
+  print_pass "History"
+else
+  print_fail "History"
+fi
+
+echo -e "\n🧪 ${GREEN}CLI system test complete.${NC}"

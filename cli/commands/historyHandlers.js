@@ -23,7 +23,7 @@ async function showHistory() {
 
     const history = response.data.history;
 
-    if (!history.length) {
+    if (!Array.isArray(history) || history.length === 0) {
       spinner.stop();
       console.log('📭 No history found.');
       return;
