@@ -1,4 +1,7 @@
-const Response = require('../models/Response'); // or wherever your model is
+const express = require('express');
+const router = express.Router();
+const { sendPrompt } = require('../services/openaiService');
+const Response = require('../models/Response');
 
 router.post('/', async (req, res) => {
   const { codeSnippet, language = 'JavaScript' } = req.body;
@@ -19,7 +22,6 @@ Return only the fixed code with no explanations.
   try {
     const fixedCode = await sendPrompt(prompt);
 
-    // Save to DB for this user
     if (req.user && req.user.id) {
       await Response.create({
         userId: req.user.id,
@@ -36,4 +38,7 @@ Return only the fixed code with no explanations.
     res.status(500).json({ error: 'Failed to generate fixed code' });
   }
 });
+
+module.exports = router;
+
 
