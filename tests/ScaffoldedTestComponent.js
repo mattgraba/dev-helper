@@ -1,42 +1,40 @@
-Sure, here's an example of a modern React component using best practices:
+Sure, here's a basic example of a modern React functional component using best practices:
 
-```jsx
-// Importing React and other necessary libraries
+```javascript
+// Import React and other necessary libraries from react
 import React from 'react';
 import PropTypes from 'prop-types';
 
-/**
- * This is a modern functional React component using arrow function.
- * It's named "TestComponent" and it represents a test component in the application.
- * It uses PropTypes for type checking of the props.
- *
- * @param {Object} props - The props that are passed to this component.
- * @returns {JSX.Element} - Returns a JSX element.
- */
+// Component Description
+// This is a functional component named "TestComponent" 
+// It's a modern React component which follows best practices
 const TestComponent = (props) => {
-    const { title, description } = props;
+  // Destructure props for easier usage in the component
+  const { className, children } = props;
 
-    // Render the component
-    return (
-        <div className="test-component">
-            <h2>{title}</h2>
-            <p>{description}</p>
-        </div>
-    );
-};
+  // Component JSX
+  return (
+    <div className={className}>
+      {children}
+    </div>
+  );
+}
 
-// Define the PropTypes for this component
+// Prop types validation
+// Helps with development to catch potential bugs before they happen
+// and provides documentation to other developers working on the project
 TestComponent.propTypes = {
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string.isRequired,
+  className: PropTypes.string,
+  children: PropTypes.node,
 };
 
-// Export the component
+// Default props
+// Provides default values for props if they aren't provided
+TestComponent.defaultProps = {
+  className: '',
+  children: null,
+};
+
 export default TestComponent;
 ```
-
-This is a functional component that receives two props: `title` and `description`. Both of these props are required and must be strings, as dictated by the PropTypes. 
-
-The component itself is quite simple: It renders a `div` with a `h2` and a `p` that display the `title` and `description` props, respectively. 
-
-Please replace the actual logic and structure as per your application's need.
+This is a simple functional React component that takes in a `className` and `children` as props. It applies the `className` to the div and renders any `children` inside of that div. It includes prop types validation and default props to help catch bugs and document the component.

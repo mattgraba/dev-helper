@@ -1,3 +1,5 @@
+Here is the corrected JavaScript code:
+
 ```javascript
 // tests/sample-bug.js
 
@@ -6,5 +8,4 @@ function greet(name) {
 }
 
 greet("Matthew");
-
 ```

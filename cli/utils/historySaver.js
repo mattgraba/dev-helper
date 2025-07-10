@@ -1,6 +1,6 @@
 const axios = require('axios');
 const getToken = require('./getToken');
-const jwtDecode = require('jwt-decode').default;
+const { jwtDecode } = require('jwt-decode');
 
 async function saveToHistory({ command, input, output }) {
   try {
