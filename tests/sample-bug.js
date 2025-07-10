@@ -1,13 +1,8 @@
-// JavaScript for CLI testing
+// tests/sample-bug.js
 
-// Function to greet a given name
-const greet = (name) => {
-    if(typeof name !== 'string' || !name.trim()) {
-        console.error('Invalid argument. Name should be a non-empty string.');
-        return;
-    }
-    console.log(`Hello, ${name.trim()}!`);
-}
-
-// Test the greet function
-greet("world");
+function greet(name {
+    console.log("Hello, " + name)
+  }
+  
+  greet("Matthew")
+  
