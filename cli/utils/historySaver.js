@@ -10,6 +10,10 @@ async function saveToHistory({ command, input, output }) {
     const decoded = jwtDecode(token);
     const userId = decoded.id;
 
+    if (!command) {
+        console.warn('⚠️ Warning: No command passed to saveToHistory');
+      }
+
     await axios.post('http://localhost:3001/history', {
       userId,
       command,

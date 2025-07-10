@@ -3,8 +3,12 @@ const mongoose = require('mongoose');
 const ResponseSchema = new mongoose.Schema({
   userId: {
     type: String,
-    required: false, // optional for now, but will be required with auth
+    required: false,
     index: true
+  },
+  command: {
+    type: String,
+    required: false
   },
   input: {
     type: String,
@@ -21,7 +25,6 @@ const ResponseSchema = new mongoose.Schema({
   }
 });
 
-// Optional: Compound index for fast filtering
 ResponseSchema.index({ userId: 1, timestamp: -1 });
 
 module.exports = mongoose.model('Response', ResponseSchema);
