@@ -1,18 +1,18 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const router = express.Router();
+const jwt = require('jsonwebtoken');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-helper-secret';
+const SECRET_KEY = process.env.JWT_SECRET || 'default-secret-key';
 
-router.post('/login', async (req, res) => {
-    const {userId} = req.body;
+router.post('/login', (req, res) => {
+  const { userId } = req.body;
 
-    if (!userId) {
-        return res.status(400).json({error: 'userId is required'});
-    }
+  if (!userId || typeof userId !== 'string' || !userId.trim()) {
+    return res.status(400).json({ error: 'Missing or invalid userId' });
+  }
 
-    const token = jwt.sign({id: userId}, JWT_SECRET, {expiresIn: '7d'});
-    res.json({token});
+  const token = jwt.sign({ id: userId }, SECRET_KEY, { expiresIn: '7d' });
+  res.json({ token });
 });
 
 module.exports = router;

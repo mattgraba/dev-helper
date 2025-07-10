@@ -1,32 +1,46 @@
 const express = require('express');
 const router = express.Router();
 const { sendPrompt } = require('../services/openaiService');
+const Response = require('../models/Response');
+const authMiddleware = require('../middleware/authMiddleware');
 
-router.post('/', async (req, res) => {
+router.post('/', authMiddleware, async (req, res) => {
   const {
     description,
     language = 'JavaScript',
     context = '',
     fileType = '',
-    outputPreference = 'code only, no explanation'
+    outputPreference = 'code only, no explanation',
   } = req.body;
 
-  if (!description) return res.status(400).json({ error: 'Missing description' });
+  if (!description || typeof description !== 'string' || !description.trim()) {
+    return res.status(400).json({ error: 'Missing or invalid description' });
+  }
 
   const prompt = `
-You are a senior software engineer and code generator.
-Generate a ${fileType || 'code file'} in ${language} based on the following description:
+Generate ${fileType ? fileType + ' ' : ''}code in ${language} for the following description:
 
 "${description}"
 
-${context ? `Context:\n${context}` : ''}
+Output preference: ${outputPreference}
 
-Only output clean, complete code with no explanation.
+${context ? `\n\nAdditional context:\n${context}` : ''}
 `;
 
   try {
-    const result = await sendPrompt(prompt);
-    res.json({ result });
+    const generatedCode = await sendPrompt(prompt);
+
+    if (req.user?.id) {
+      await Response.create({
+        userId: req.user.id,
+        input: description,
+        output: generatedCode,
+        command: 'generate',
+        createdAt: new Date(),
+      });
+    }
+
+    res.json({ generatedCode });
   } catch (err) {
     console.error('Generate route error:', err);
     res.status(500).json({ error: 'Failed to generate code' });

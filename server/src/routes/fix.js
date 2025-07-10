@@ -2,27 +2,31 @@ const express = require('express');
 const router = express.Router();
 const { sendPrompt } = require('../services/openaiService');
 const Response = require('../models/Response');
+const authMiddleware = require('../middleware/authMiddleware');
 
-router.post('/', async (req, res) => {
-  const { codeSnippet, language = 'JavaScript' } = req.body;
-  if (!codeSnippet) return res.status(400).json({ error: 'Missing codeSnippet' });
+router.post('/', authMiddleware, async (req, res) => {
+  const { codeSnippet, language = 'JavaScript', contextFiles = [] } = req.body;
+
+  if (!codeSnippet || typeof codeSnippet !== 'string' || !codeSnippet.trim()) {
+    return res.status(400).json({ error: 'Missing or invalid codeSnippet' });
+  }
+
+  const contextText = contextFiles.map(f => `// ${f.name}\n${f.content}`).join('\n\n');
 
   const prompt = `
-You are an expert software engineer.
-Here is some ${language} code:
+You are a software engineer. Fix the following ${language} code and return only the corrected version:
 
 \`\`\`${language}
 ${codeSnippet}
 \`\`\`
 
-Please provide a cleaned-up, fixed, and improved version of this code.
-Return only the fixed code with no explanations.
+${contextText ? `Here is additional context:\n\n${contextText}` : ''}
 `;
 
   try {
     const fixedCode = await sendPrompt(prompt);
 
-    if (req.user && req.user.id) {
+    if (req.user?.id) {
       await Response.create({
         userId: req.user.id,
         input: codeSnippet,
@@ -35,10 +39,8 @@ Return only the fixed code with no explanations.
     res.json({ fixedCode });
   } catch (err) {
     console.error('Fix route error:', err);
-    res.status(500).json({ error: 'Failed to generate fixed code' });
+    res.status(500).json({ error: 'Failed to fix code' });
   }
 });
 
 module.exports = router;
-
-

@@ -1,37 +1,38 @@
 const express = require('express');
 const router = express.Router();
 const { sendPrompt } = require('../services/openaiService');
+const Response = require('../models/Response');
+const authMiddleware = require('../middleware/authMiddleware');
 
-router.post('/', async (req, res) => {
-  const {
-    goal,
-    context = {},
-    task = 'Generate project file structure and boilerplate code.',
-    outputPreference = 'modular code blocks'
-  } = req.body;
+router.post('/', authMiddleware, async (req, res) => {
+  const { name } = req.body;
 
-  if (!goal) return res.status(400).json({ error: 'Missing goal' });
+  if (!name || typeof name !== 'string' || !name.trim()) {
+    return res.status(400).json({ error: 'Missing or invalid name' });
+  }
 
   const prompt = `
-You are a senior full-stack engineer and code scaffolding expert.
-Your task is to help a developer accomplish the following goal:
-Goal: ${goal}
-
-Here is the current context:
-${JSON.stringify(context, null, 2)}
-
-Task: ${task}
-Output Preference: ${outputPreference}
-
-Respond ONLY with code and brief explanations if needed.
+Scaffold a modern React component named "${name}" using best practices.
+Include comments and clear structure.
 `;
 
   try {
-    const response = await sendPrompt(prompt);
-    res.json({ componentCode: response });
+    const scaffoldCode = await sendPrompt(prompt);
+
+    if (req.user?.id) {
+      await Response.create({
+        userId: req.user.id,
+        input: name,
+        output: scaffoldCode,
+        command: 'scaffold',
+        createdAt: new Date(),
+      });
+    }
+
+    res.json({ scaffoldCode });
   } catch (err) {
     console.error('Scaffold route error:', err);
-    res.status(500).json({ error: 'Failed to get scaffold output' });
+    res.status(500).json({ error: 'Failed to generate scaffold' });
   }
 });
 
