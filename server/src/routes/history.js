@@ -16,4 +16,24 @@ router.get('/', authMiddleware, async (req, res) => {
   }
 });
 
+router.post('/', authMiddleware, async (req, res) => {
+  try {
+    const { command, input, output } = req.body;
+
+    const newEntry = await Response.create({
+      userId: req.user.id,
+      command,
+      input,
+      output,
+      createdAt: new Date(),
+    });
+
+    res.status(201).json(newEntry);
+  } catch (err) {
+    console.error('Failed to save to history:', err);
+    res.status(500).json({ error: 'Failed to save history' });
+  }
+});
+
+
 module.exports = router;
