@@ -2,83 +2,52 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
-const ora = require('ora').default;
-const { scanFiles } = require('../utils/fileScanner');
+const ora = require('ora');
+
+const getToken = require('../utils/getToken');
+const { checkFileExists } = require('../utils/fsUtils');
 const handleCliError = require('../utils/errorHandler');
+const saveToHistory = require('../utils/historySaver');
 
-async function handleGenerateBasic({ description, language, fileType, output }) {
-  const spinner = ora('Sending request to /generate...').start();
+async function handleGenerateBasic({ description, outputPath }) {
   try {
-    const lang = language?.toLowerCase?.() || 'javascript';
+    const token = getToken();
+    if (!token) {
+      console.error(chalk.red('❌ You must be logged in to use this command.'));
+      process.exit(1);
+    }
 
+    const spinner = ora('Sending request to /generate...').start();
     const res = await axios.post('http://localhost:3001/generate', {
       description,
-      language: lang,
-      fileType,
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     });
-
-    let { result } = res.data;
-    if (!result) throw new Error('No result from AI.');
-
-    result = result.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
-
-    if (output) {
-      const outPath = path.resolve(output);
-      fs.mkdirSync(path.dirname(outPath), { recursive: true });
-      fs.writeFileSync(outPath, result);
-      console.log(chalk.green(`✅ Code saved to ${output}`));
-    } else {
-      console.log(chalk.yellow('\nNo output path provided. Here is the code:\n'));
-      console.log(result);
-    }
 
     spinner.succeed('Generation complete ✅');
-  } catch (err) {
-    handleCliError(spinner, err, 'Failed to generate code ❌');
-  }
-}
 
-async function handleGenerateWithContext({ description, language, fileType, output }) {
-  const spinner = ora('Sending contextual request to /generate...').start();
-  try {
-    const lang = language?.toLowerCase?.() || 'javascript';
+    const { generatedCode } = res.data;
 
-    const contextFiles = await scanFiles({
-      directory: process.cwd(),
-      extensions: ['js', 'ts', 'json'],
-      maxFileSizeKB: 100,
-    });
-
-    const res = await axios.post('http://localhost:3001/generate', {
-      description,
-      language: lang,
-      fileType,
-      contextFiles,
-    });
-
-    let { result } = res.data;
-    if (!result) throw new Error('No result from AI.');
-
-    result = result.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
-
-    if (output) {
-      const outPath = path.resolve(output);
-      fs.mkdirSync(path.dirname(outPath), { recursive: true });
-      fs.writeFileSync(outPath, result);
-      console.log(chalk.green(`✅ Code saved to ${output}`));
+    if (outputPath) {
+      const fullPath = path.resolve(outputPath);
+      fs.writeFileSync(fullPath, generatedCode, 'utf-8');
+      console.log(chalk.blue(`\n✅ Saved to ${fullPath}`));
     } else {
-      console.log(chalk.yellow('\nNo output path provided. Here is the code:\n'));
-      console.log(result);
+      console.log(chalk.green('\n🧠 Generated Code:\n'), generatedCode);
     }
 
-    spinner.succeed('Contextual generation complete ✅');
+    await saveToHistory({
+      command: 'generate',
+      input: description,
+      output: generatedCode,
+    });
+
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to generate code with context ❌');
+    handleCliError('generate', err);
   }
 }
 
 module.exports = {
   handleGenerateBasic,
-  handleGenerateWithContext,
 };
 

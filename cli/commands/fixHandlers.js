@@ -2,75 +2,101 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
-const ora = require('ora').default;
+const ora = require('ora');
+
+const getToken = require('../utils/getToken');
 const { scanFiles } = require('../utils/fileScanner');
-const handleCliError = require('../utils/errorHandler');
 const { checkFileExists } = require('../utils/fsUtils');
+const handleCliError = require('../utils/errorHandler');
+const saveToHistory = require('../utils/historySaver');
 
-async function handleFixBasic({ filePath, language, output }) {
-  const spinner = ora(`Sending ${filePath} to /fix...`).start();
+async function handleFixBasic({ filePath, language, outputPath }) {
   try {
-    const resolvedPath = path.resolve(filePath);
-    if (!checkFileExists(resolvedPath)) return;
+    if (!checkFileExists(filePath)) {
+      throw new Error(`File not found: ${filePath}`);
+    }
 
-    const code = fs.readFileSync(resolvedPath, 'utf-8');
-    const lang = language?.toLowerCase?.() || 'javascript';
+    const token = getToken();
+    if (!token) {
+      console.error(chalk.red('❌ You must be logged in to use this command.'));
+      process.exit(1);
+    }
 
+    const originalCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
+
+    const spinner = ora(`Sending ${filePath} to /fix...`).start();
     const res = await axios.post('http://localhost:3001/fix', {
-      codeSnippet: code,
-      language: lang,
+      codeSnippet: originalCode,
+      language,
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     });
 
-    let { fixedCode } = res.data;
-    if (!fixedCode) throw new Error('No code returned from /fix.');
-
-    fixedCode = fixedCode.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
-
-    const outPath = output ? path.resolve(output) : resolvedPath;
-    fs.mkdirSync(path.dirname(outPath), { recursive: true });
-    fs.writeFileSync(outPath, fixedCode);
-
-    console.log(chalk.green(`✅ Fixed code written to ${output || filePath}`));
     spinner.succeed('Fix complete ✅');
+
+    const { fixedCode } = res.data;
+
+    if (outputPath) {
+      fs.writeFileSync(outputPath, fixedCode, 'utf-8');
+      console.log(chalk.blue(`\n✅ Saved to ${outputPath}`));
+    } else {
+      console.log(chalk.green('\n🔧 Fixed Code:\n'), fixedCode);
+    }
+
+    await saveToHistory({
+      command: 'fix',
+      input: originalCode,
+      output: fixedCode,
+    });
+
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to fix code ❌');
+    handleCliError('fix', err);
   }
 }
 
-async function handleFixWithContext({ filePath, language, output }) {
-  const spinner = ora(`Sending ${filePath} with context to /fix...`).start();
-  const resolvedPath = path.resolve(filePath);
-  if (!checkFileExists(resolvedPath)) return;
-
+async function handleFixWithContext({ filePath, language, outputPath }) {
   try {
-    const mainCode = fs.readFileSync(resolvedPath, 'utf-8');
-    const lang = language?.toLowerCase?.() || 'javascript';
+    if (!checkFileExists(filePath)) {
+      throw new Error(`File not found: ${filePath}`);
+    }
 
-    const contextFiles = await scanFiles({
-      directory: process.cwd(),
-      extensions: ['js', 'ts', 'json'],
-      maxFileSizeKB: 100,
-    });
+    const token = getToken();
+    if (!token) {
+      console.error(chalk.red('❌ You must be logged in to use this command.'));
+      process.exit(1);
+    }
 
+    const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
+    const contextFiles = await scanFiles(path.dirname(filePath), filePath);
+
+    const spinner = ora(`Sending ${filePath} with context to /fix...`).start();
     const res = await axios.post('http://localhost:3001/fix', {
       codeSnippet: mainCode,
-      language: lang,
+      language,
       contextFiles,
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     });
 
-    let { fixedCode } = res.data;
-    if (!fixedCode) throw new Error('No code returned from /fix.');
+    spinner.succeed('Fix with context complete ✅');
 
-    fixedCode = fixedCode.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
+    const { fixedCode } = res.data;
 
-    const outPath = output ? path.resolve(output) : resolvedPath;
-    fs.mkdirSync(path.dirname(outPath), { recursive: true });
-    fs.writeFileSync(outPath, fixedCode);
+    if (outputPath) {
+      fs.writeFileSync(outputPath, fixedCode, 'utf-8');
+      console.log(chalk.blue(`\n✅ Saved to ${outputPath}`));
+    } else {
+      console.log(chalk.green('\n🔧 Fixed Code:\n'), fixedCode);
+    }
 
-    console.log(chalk.green(`✅ Fixed code written to ${output || filePath}`));
-    spinner.succeed('Contextual fix complete ✅');
+    await saveToHistory({
+      command: 'fix',
+      input: mainCode,
+      output: fixedCode,
+    });
+
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to fix code with context ❌');
+    handleCliError('fix', err);
   }
 }
 
@@ -78,4 +104,5 @@ module.exports = {
   handleFixBasic,
   handleFixWithContext,
 };
+
 

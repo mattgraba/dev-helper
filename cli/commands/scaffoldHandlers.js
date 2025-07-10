@@ -2,65 +2,53 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
-const { scanFiles } = require('../utils/fileScanner');
+const ora = require('ora');
+
+const getToken = require('../utils/getToken');
+const { checkFileExists } = require('../utils/fsUtils');
 const handleCliError = require('../utils/errorHandler');
-const ora = require('ora').default;
+const saveToHistory = require('../utils/historySaver');
 
-async function handleScaffoldBasic({ name, output }) {
-  const spinner = ora(`Sending request to /scaffold for ${name}...`).start();
+async function handleScaffoldBasic({ name, outputPath }) {
   try {
+    const token = getToken();
+    if (!token) {
+      console.error(chalk.red('❌ You must be logged in to use this command.'));
+      process.exit(1);
+    }
+
+    const spinner = ora(`Sending request to /scaffold for ${name}...`).start();
+
     const res = await axios.post('http://localhost:3001/scaffold', {
-      goal: `Create a ${name} component`,
+      name,
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     });
-
-    let { componentCode } = res.data;
-    if (!componentCode) throw new Error('No component code returned from /scaffold.');
-
-    componentCode = componentCode.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
-
-    const outPath = output || `client/components/${name}.jsx`;
-    const resolvedPath = path.resolve(outPath);
-    fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
-    fs.writeFileSync(resolvedPath, componentCode);
 
     spinner.succeed('Scaffold complete ✅');
-  } catch (err) {
-    handleCliError(spinner, err, 'Failed to scaffold component ❌');
-  }
-}
 
-async function handleScaffoldWithContext({ name, output }) {
-  const spinner = ora(`Sending contextual request to /scaffold for ${name}...`).start();
-  try {
-    const contextFiles = await scanFiles({
-      directory: process.cwd(),
-      extensions: ['js', 'ts', 'json'],
-      maxFileSizeKB: 100,
+    const { scaffoldCode } = res.data;
+
+    if (outputPath) {
+      const fullPath = path.resolve(outputPath);
+      fs.writeFileSync(fullPath, scaffoldCode, 'utf-8');
+      console.log(chalk.blue(`\n✅ Saved to ${fullPath}`));
+    } else {
+      console.log(chalk.green('\n🧱 Scaffolded Code:\n'), scaffoldCode);
+    }
+
+    await saveToHistory({
+      command: 'scaffold',
+      input: name,
+      output: scaffoldCode,
     });
 
-    const res = await axios.post('http://localhost:3001/scaffold', {
-      goal: `Create a ${name} component`,
-      contextFiles,
-    });
-
-    let { componentCode } = res.data;
-    if (!componentCode) throw new Error('No component code returned from /scaffold.');
-
-    componentCode = componentCode.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
-
-    const outPath = output || `client/components/${name}.jsx`;
-    const resolvedPath = path.resolve(outPath);
-    fs.mkdirSync(path.dirname(resolvedPath), { recursive: true });
-    fs.writeFileSync(resolvedPath, componentCode);
-
-    spinner.succeed('Contextual scaffold complete ✅');
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to scaffold component with context ❌');
+    handleCliError('scaffold', err);
   }
 }
 
 module.exports = {
   handleScaffoldBasic,
-  handleScaffoldWithContext,
 };
 

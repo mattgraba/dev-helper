@@ -2,65 +2,91 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
-const ora = require('ora').default;
+const ora = require('ora');
+
+const getToken = require('../utils/getToken');
+const { checkFileExists } = require('../utils/fsUtils');
 const { scanFiles } = require('../utils/fileScanner');
 const handleCliError = require('../utils/errorHandler');
-const { checkFileExists } = require('../utils/fsUtils');
+const saveToHistory = require('../utils/historySaver');
 
 async function handleAnalyzeBasic({ filePath, language }) {
-  const spinner = ora(`Sending ${filePath} to /analyze...`).start();
   try {
-    const resolvedPath = path.resolve(filePath);
-    if (!checkFileExists(resolvedPath)) return;
+    if (!checkFileExists(filePath)) {
+      throw new Error(`File not found: ${filePath}`);
+    }
 
-    const code = fs.readFileSync(resolvedPath, 'utf-8');
-    const lang = language || 'javascript';  // Default for language
-      
+    const token = getToken();
+    if (!token) {
+      console.error(chalk.red('❌ You must be logged in to use this command.'));
+      process.exit(1);
+    }
+
+    const errorText = fs.readFileSync(path.resolve(filePath), 'utf-8');
+
+    const spinner = ora(`Sending ${filePath} to /analyze...`).start();
     const res = await axios.post('http://localhost:3001/analyze', {
-      errorText: code,
-      language: lang,
+      errorText,
+      language,
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     });
 
     spinner.succeed('Analysis complete ✅');
 
     const { explanation, fix } = res.data;
-
     console.log(chalk.green('\n🧠 Explanation:\n'), explanation);
-    console.log(chalk.green('\n🛠 Suggested Fix:\n'), fix);
+    console.log(chalk.blue('\n🔧 Suggested Fix:\n'), fix);
+
+    await saveToHistory({
+      command: 'analyze',
+      input: errorText,
+      output: `${explanation}\n\n${fix}`,
+    });
+
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to generate analyze command ❌');
+    handleCliError('analyze', err);
   }
 }
 
 async function handleAnalyzeWithContext({ filePath, language }) {
-  const spinner = ora(`Sending ${filePath} with context to /analyze...`).start();
   try {
-    const resolvedPath = path.resolve(filePath);
-    if (!checkFileExists(resolvedPath)) return;
-    
-    const mainCode = fs.readFileSync(resolvedPath, 'utf-8');
-    const lang = language || 'javascript';
+    if (!checkFileExists(filePath)) {
+      throw new Error(`File not found: ${filePath}`);
+    }
 
-    const contextFiles = await scanFiles({
-      directory: process.cwd(),
-      extensions: ['js', 'ts', 'json'],
-      maxFileSizeKB: 100,
-    });
+    const token = getToken();
+    if (!token) {
+      console.error(chalk.red('❌ You must be logged in to use this command.'));
+      process.exit(1);
+    }
 
+    const errorText = fs.readFileSync(path.resolve(filePath), 'utf-8');
+    const contextFiles = await scanFiles(path.dirname(filePath), filePath);
+
+    const spinner = ora(`Sending ${filePath} with context to /analyze...`).start();
     const res = await axios.post('http://localhost:3001/analyze', {
-      errorText: mainCode,
-      language: lang,
+      errorText,
+      language,
       contextFiles,
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     });
 
     spinner.succeed('Contextual analysis complete ✅');
 
     const { explanation, fix } = res.data;
-
     console.log(chalk.green('\n🧠 Explanation:\n'), explanation);
-    console.log(chalk.green('\n🛠 Suggested Fix:\n'), fix);
+    console.log(chalk.blue('\n🔧 Suggested Fix:\n'), fix);
+
+    await saveToHistory({
+      command: 'analyze',
+      input: errorText,
+      output: `${explanation}\n\n${fix}`,
+    });
+
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to generate analyze command with context ❌');
+    handleCliError('analyze', err);
   }
 }
 

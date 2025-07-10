@@ -2,61 +2,89 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const chalk = require('chalk');
-const ora = require('ora').default;
+const ora = require('ora');
+
+const getToken = require('../utils/getToken');
 const { scanFiles } = require('../utils/fileScanner');
-const handleCliError = require('../utils/errorHandler');
 const { checkFileExists } = require('../utils/fsUtils');
+const handleCliError = require('../utils/errorHandler');
+const saveToHistory = require('../utils/historySaver');
 
 async function handleExplainBasic({ filePath, language }) {
-  const spinner = ora(`Sending ${filePath} to /explain...`).start();
   try {
-    const resolvedPath = path.resolve(filePath);
-    if (!checkFileExists(resolvedPath)) return;
+    if (!checkFileExists(filePath)) {
+      throw new Error(`File not found: ${filePath}`);
+    }
 
-    const code = fs.readFileSync(resolvedPath, 'utf-8');
-    const lang = language || 'javascript';
+    const token = getToken();
+    if (!token) {
+      console.error(chalk.red('❌ You must be logged in to use this command.'));
+      process.exit(1);
+    }
 
+    const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
+
+    const spinner = ora(`Sending ${filePath} to /explain...`).start();
     const res = await axios.post('http://localhost:3001/explain', {
-      codeSnippet: code,
-      language: lang,
+      codeSnippet: mainCode,
+      language,
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     });
 
     spinner.succeed('Explanation complete ✅');
 
-    console.log(chalk.green('\n🧠 Explanation:\n'));
-    console.log(res.data.explanation);
+    const { explanation } = res.data;
+    console.log(chalk.green('\n📖 Explanation:\n'), explanation);
+
+    await saveToHistory({
+      command: 'explain',
+      input: mainCode,
+      output: explanation,
+    });
+
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to generate explain command ❌');
+    handleCliError('explain', err);
   }
 }
 
 async function handleExplainWithContext({ filePath, language }) {
-  const spinner = ora(`Sending ${filePath} with context to /explain...`).start();
   try {
-    const resolvedPath = path.resolve(filePath);
-    if (!checkFileExists(resolvedPath)) return;
+    if (!checkFileExists(filePath)) {
+      throw new Error(`File not found: ${filePath}`);
+    }
 
-    const mainCode = fs.readFileSync(resolvedPath, 'utf-8');
-    const lang = language || 'javascript';
+    const token = getToken();
+    if (!token) {
+      console.error(chalk.red('❌ You must be logged in to use this command.'));
+      process.exit(1);
+    }
 
-    const contextFiles = await scanFiles({
-      directory: process.cwd(),
-      extensions: ['js', 'ts', 'json'],
-      maxFileSizeKB: 100,
-    });
+    const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
+    const contextFiles = await scanFiles(path.dirname(filePath), filePath);
 
+    const spinner = ora(`Sending ${filePath} with context to /explain...`).start();
     const res = await axios.post('http://localhost:3001/explain', {
       codeSnippet: mainCode,
-      language: lang,
+      language,
       contextFiles,
+    }, {
+      headers: { Authorization: `Bearer ${token}` }
     });
 
     spinner.succeed('Contextual explanation complete ✅');
 
-    console.log(chalk.green('\n🧠 Explanation:\n'));
-    console.log(res.data.explanation);
+    const { explanation } = res.data;
+    console.log(chalk.green('\n📖 Explanation:\n'), explanation);
+
+    await saveToHistory({
+      command: 'explain',
+      input: mainCode,
+      output: explanation,
+    });
+
   } catch (err) {
-    handleCliError(spinner, err, 'Failed to generate explain command with context ❌');
+    handleCliError('explain', err);
   }
 }
 
@@ -64,3 +92,4 @@ module.exports = {
   handleExplainBasic,
   handleExplainWithContext,
 };
+

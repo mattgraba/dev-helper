@@ -17,7 +17,7 @@ const handleHistory = require('./commands/historyCommand');
 // CLI Metadata: defines basic information when a user runs `dev-helper --help`
 program
   .name('dev-helper')
-  .description('AI-powered developer assistant CLI')
+  .description('A developer CLI assistant powered by AI')
   .version('1.0.0');
 
 // Register commands
