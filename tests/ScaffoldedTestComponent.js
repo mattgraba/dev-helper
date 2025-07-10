@@ -1,47 +1,42 @@
-Sure, here is a basic example of a modern functional React component using React Hooks and PropTypes for type checking. I've also included some comments to explain each section.
+Sure, here's an example of a modern React component using best practices:
 
 ```jsx
-// Import React and PropTypes
-import React, { useState } from 'react';
+// Importing React and other necessary libraries
+import React from 'react';
 import PropTypes from 'prop-types';
 
-// TestComponent functional component
-const TestComponent = ({ initialCount }) => {
-  // Use useState for count state
-  const [count, setCount] = useState(initialCount);
+/**
+ * This is a modern functional React component using arrow function.
+ * It's named "TestComponent" and it represents a test component in the application.
+ * It uses PropTypes for type checking of the props.
+ *
+ * @param {Object} props - The props that are passed to this component.
+ * @returns {JSX.Element} - Returns a JSX element.
+ */
+const TestComponent = (props) => {
+    const { title, description } = props;
 
-  // Function to increment count
-  const incrementCount = () => {
-    setCount(count + 1);
-  };
-
-  // Render component
-  return (
-    <div className="test-component">
-      <p>Count: {count}</p>
-      <button onClick={incrementCount}>Increase Count</button>
-    </div>
-  );
+    // Render the component
+    return (
+        <div className="test-component">
+            <h2>{title}</h2>
+            <p>{description}</p>
+        </div>
+    );
 };
 
-// Define PropTypes for component
+// Define the PropTypes for this component
 TestComponent.propTypes = {
-  initialCount: PropTypes.number,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
 };
 
-// Define default props for component
-TestComponent.defaultProps = {
-  initialCount: 0,
-};
-
-// Export component
+// Export the component
 export default TestComponent;
 ```
 
-In this component, we first import the necessary dependencies. The component itself is a functional component that uses the `useState` hook to manage its own state. The initial state value is passed via props.
+This is a functional component that receives two props: `title` and `description`. Both of these props are required and must be strings, as dictated by the PropTypes. 
 
-We then define a function `incrementCount` which is used to increment the value of `count` when a button is clicked.
+The component itself is quite simple: It renders a `div` with a `h2` and a `p` that display the `title` and `description` props, respectively. 
 
-Finally, we define PropTypes for the component to provide type checking for the props and set default props in case `initialCount` prop is not provided when this component is used.
-
-The component is then exported to be used elsewhere in the application.
+Please replace the actual logic and structure as per your application's need.
