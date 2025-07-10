@@ -12,6 +12,8 @@ module.exports = (program) => {
     .option('--template <value>', 'Optional template or structure type')
     .showHelpAfterError(true)
     .action((options) => {
-      handleGenerateBasic(options);
+      const { output, ...rest } = options;
+      const fixedOptions = { ...rest, outputPath: output };
+      handleGenerateBasic(fixedOptions);
     });
 };

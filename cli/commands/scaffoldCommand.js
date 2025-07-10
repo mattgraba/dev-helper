@@ -10,7 +10,9 @@ module.exports = (program) => {
     .option('--output <path>', 'Optional file path to save scaffolded output')
     .showHelpAfterError(true)
     .action((options) => {
-      handleScaffoldBasic(options);
+      const { output, ...rest } = options;
+      const fixedOptions = { ...rest, outputPath: output };
+      handleScaffoldBasic(fixedOptions);
     });
 };
 

@@ -13,8 +13,9 @@ module.exports = (program) => {
     .option('--output <path>', 'Optional path to save the fixed output file')
     .showHelpAfterError(true)
     .action((options) => {
+      const { output, ...rest } = options;
       handleWithContext({
-        options,
+        options: { ...rest, outputPath: output },
         handleBasic: handleFixBasic,
         handleWithContext: handleFixWithContext,
       });
