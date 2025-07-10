@@ -10,9 +10,12 @@ echo "✅ Login passed"
 
 # Test analyze
 echo "🔍 Testing analyze..."
+echo "[DEBUG] Running: dev-helper analyze -f ./tests/sample-bug.js -l javascript"
 dev-helper analyze -f ./tests/sample-bug.js -l javascript
+echo "[DEBUG] Analyze finished"
 if [ $? -ne 0 ]; then echo "❌ Analyze failed"; exit 1; fi
 echo "✅ Analyze passed"
+
 
 # Test explain
 echo "📖 Testing explain..."
