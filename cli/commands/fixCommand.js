@@ -4,11 +4,14 @@ const handleWithContext = require('../utils/contextHandlerWrapper');
 module.exports = (program) => {
   program
     .command('fix')
-    .description('Fix or clean up a buggy code file')
-    .requiredOption('-f, --filePath <filePath>', 'Path to the code file')
-    .option('-l, --language <lang>', 'Language of the code (default: JavaScript)', 'JavaScript')
-    .option('-o, --output <path>', 'Where to save the fixed code (defaults to overwrite)')
-    .option('--context', 'Include project context')
+    .alias('f')
+    .description('Fix buggy code using AI-generated improvements')
+    .usage('-f <file> -l <language> [--context] [--output <path>]')
+    .requiredOption('-f, --file <path>', 'Path to the file containing the buggy code')
+    .requiredOption('-l, --language <name>', 'Programming language (e.g., javascript, python)')
+    .option('--context', 'Include surrounding project files for more accurate fixes')
+    .option('--output <path>', 'Optional path to save the fixed output file')
+    .showHelpAfterError(true)
     .action((options) => {
       handleWithContext({
         options,

@@ -4,10 +4,13 @@ const handleWithContext = require('../utils/contextHandlerWrapper');
 module.exports = (program) => {
   program
     .command('analyze')
-    .description('Analyze a buggy code file and receive an explanation and suggested fix')
-    .option('--context', 'Include project context')
-    .requiredOption('--filePath <filePath>', 'Path to the main file to analyze')
-    .option('--language <language>', 'Programming language')
+    .alias('a')
+    .description('Analyze code errors and receive an AI explanation and fix')
+    .usage('-f <file> -l <language> [--context]')
+    .requiredOption('-f, --file <path>', 'Path to code file with an error')
+    .requiredOption('-l, --language <name>', 'Programming language')
+    .option('--context', 'Include context from surrounding project files')
+    .showHelpAfterError(true)
     .action((options) => {
       handleWithContext({
         options,

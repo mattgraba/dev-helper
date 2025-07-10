@@ -1,21 +1,16 @@
-const handleWithContext = require('../utils/contextHandlerWrapper');
-const {
-  handleScaffoldBasic,
-  handleScaffoldWithContext,
-} = require('./scaffoldHandlers');
+const { handleScaffoldBasic } = require('./scaffoldHandlers');
 
 module.exports = (program) => {
   program
     .command('scaffold')
-    .description('Scaffold a new component using AI')
-    .requiredOption('-n, --name <ComponentName>', 'Name of the component to scaffold')
-    .option('-o, --output <path>', 'Output path (e.g. client/components/AgentCard.jsx)')
-    .option('--context', 'Include project context')
+    .alias('s')
+    .description('Scaffold a basic project component or template')
+    .usage('-n <name> [--output <path>]')
+    .requiredOption('-n, --name <text>', 'Name of the component or feature')
+    .option('--output <path>', 'Optional file path to save scaffolded output')
+    .showHelpAfterError(true)
     .action((options) => {
-      handleWithContext({
-        options,
-        handleBasic: handleScaffoldBasic,
-        handleWithContext: handleScaffoldWithContext,
-      });
+      handleScaffoldBasic(options);
     });
 };
+

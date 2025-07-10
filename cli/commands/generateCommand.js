@@ -1,20 +1,17 @@
-const { handleGenerateBasic, handleGenerateWithContext } = require('./generateHandlers');
-const handleWithContext = require('../utils/contextHandlerWrapper');
+const { handleGenerateBasic } = require('./generateHandlers');
 
 module.exports = (program) => {
   program
     .command('generate')
-    .description('Generate code using your AI assistant')
-    .requiredOption('-d, --description <text>', 'What you want to generate')
-    .option('-l, --language <lang>', 'Language (default: JavaScript)', 'JavaScript')
-    .option('-t, --fileType <type>', 'Type of file (e.g. React component)')
-    .option('-o, --output <path>', 'Where to save the file (e.g. client/components/AgentCard.jsx)')
-    .option('--context', 'Include project context')
+    .alias('g')
+    .description('Generate code from an AI-assisted text prompt')
+    .usage('-d <description> [--output <path>] [--name <value>] [--template <value>]')
+    .requiredOption('-d, --description <text>', 'Natural language description of the desired code')
+    .option('--output <path>', 'Optional path to save generated code')
+    .option('--name <value>', 'Optional name for generated component (if applicable)')
+    .option('--template <value>', 'Optional template or structure type')
+    .showHelpAfterError(true)
     .action((options) => {
-      handleWithContext({
-        options,
-        handleBasic: handleGenerateBasic,
-        handleWithContext: handleGenerateWithContext,
-      });
+      handleGenerateBasic(options);
     });
 };
