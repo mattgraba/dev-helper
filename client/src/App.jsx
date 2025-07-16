@@ -5,6 +5,9 @@ import LoginPage from './pages/Login';
 import HistoryPage from './pages/History';
 import NotFound from './pages/NotFound';
 import Navbar from './components/Navbar';
+import HomePage from './pages/Home';
+import AnalyzePage from './pages/Analyze';
+import PrivateRoute from './utils/privateRoute';
 
 function App() {
   const [token, setToken] = useState(localStorage.getItem('dev-helper-token'));
@@ -19,26 +22,34 @@ function App() {
   };
 
   return (
+    
     <Router>
-      {/* Optional Navbar component here */}
+      <Navbar token={token} onLogout={() => setToken(null)} />
 
       <Routes>
-        <Route
-          path="/"
-          element={
-            token ? <Navigate to="/history" /> : <Navigate to="/login" />
-          }
-        />
-
+        <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage onLogin={setToken} />} />
 
         <Route
-          path="/history"
-          element={token ? <HistoryPage /> : <Navigate to="/login" />}
+          path="/analyze"
+          element={
+            <PrivateRoute token={token}>
+              <AnalyzePage />
+            </PrivateRoute>
+          }
         />
 
-        {/* Catch-all fallback */}
+        <Route
+          path="/history"
+          element={
+            <PrivateRoute token={token}>
+              <HistoryPage />
+            </PrivateRoute>
+          }
+        />
+
         <Route path="*" element={<NotFound />} />
+
       </Routes>
     </Router>
   );
