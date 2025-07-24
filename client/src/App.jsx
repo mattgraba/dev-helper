@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './pages/Login';
 import HistoryPage from './pages/History';
 import NotFound from './pages/NotFound';
-import Navbar from './components/Navbar';
 import HomePage from './pages/Home';
 import AnalyzePage from './pages/Analyze';
 import PrivateRoute from './utils/privateRoute';
@@ -22,10 +21,7 @@ function App() {
   };
 
   return (
-    
     <Router>
-      <Navbar token={token} onLogout={() => setToken(null)} />
-
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage onLogin={setToken} />} />
@@ -49,10 +45,9 @@ function App() {
         />
 
         <Route path="*" element={<NotFound />} />
-
       </Routes>
     </Router>
   );
 }
-
 export default App;
+

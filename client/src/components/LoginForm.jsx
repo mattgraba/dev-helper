@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import api from '@/utils/api';
+import { LogInIcon } from "lucide-react";
 
 export default function LoginForm({ onLoginSuccess }) {
     const [userId, setUserId] = useState('');
@@ -30,6 +31,7 @@ export default function LoginForm({ onLoginSuccess }) {
             <h1 className="text-2xl font-bold text-center">Login to Dev Helper AI</h1>
             <form onSubmit={handleSubmit} className="space-y-4">
                 <Input
+                className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-zinc-400 border border-zinc-700 focus:border-teal-500 focus:ring-2 focus:ring-teal-400 transition"
                 type="text"
                 placeholder="Enter your user ID"
                 value={userId}
@@ -37,7 +39,10 @@ export default function LoginForm({ onLoginSuccess }) {
                 required
                 />
                 {error && <p className="text-red-500 text-sm">{error}</p>}
-                <Button type="submit" className="w-full">Log In</Button>
+                <Button type="submit" className="w-full py-3 rounded-lg bg-gradient-to-tr from-teal-500 to-indigo-500 text-white font-semibold shadow-md hover:scale-105 hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2">
+                    <LogInIcon className="w-5 h-5" />
+                    Login
+                </Button>
             </form>
             </CardContent>
         </Card>
