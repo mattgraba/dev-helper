@@ -6,6 +6,9 @@ import HistoryPage from './pages/History';
 import NotFound from './pages/NotFound';
 import HomePage from './pages/Home';
 import AnalyzePage from './pages/Analyze';
+import AboutPage from './pages/About';
+import ContactPage from './pages/Contact';
+
 import PrivateRoute from './utils/privateRoute';
 
 function App() {
@@ -17,7 +20,6 @@ function App() {
 
   const handleLogin = (newToken) => {
     setToken(newToken);
-    // Optionally navigate or fetch initial data
   };
 
   return (
@@ -32,6 +34,20 @@ function App() {
             <PrivateRoute token={token}>
               <AnalyzePage />
             </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/about"
+          element={
+            <AboutPage />
+          }
+        />
+
+        <Route
+          path="/contact"
+          element={
+            <ContactPage />
           }
         />
 

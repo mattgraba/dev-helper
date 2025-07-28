@@ -94,9 +94,9 @@ export default function NavBar() {
           Web App
         </Link>
 
-        {/* Login */}
-        <Link to="/login" style={linkStyle}>
-          Login
+        {/* Contact */}
+        <Link to="/contact" style={linkStyle}>
+          Contact
         </Link>
       </div>
     </div>

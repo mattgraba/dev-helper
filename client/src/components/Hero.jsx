@@ -1,4 +1,8 @@
+import { useNavigate } from 'react-router-dom';
+
 export default function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section className="w-full min-h-screen flex justify-center items-center bg-black text-center px-4 mb-[-400px]">
       <div className="w-[960px] h-[500px] max-w-full flex flex-col justify-top items-center gap-10 overflow-hidden mb-[100px]">
@@ -26,6 +30,7 @@ export default function Hero() {
         <div className="flex" style={{ gap: '10px' }}>
           {/* Light button */}
           <button
+            onClick={() => navigate('/about')}
             style={{
               backgroundColor: 'rgb(255, 255, 255)',
               color: 'rgb(0, 0, 0)',
@@ -40,6 +45,8 @@ export default function Hero() {
 
           {/* Dark button */}
           <button
+            onClick={() => navigate('/analyze')}
+
             style={{
               backgroundColor: 'rgb(25, 25, 25)',
               color: 'white',
