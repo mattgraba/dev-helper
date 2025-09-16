@@ -1,9 +1,9 @@
-const axios = require('axios');
-const chalk = require('chalk');
-const ora = require('ora');
+import axios from 'axios';
+import chalk from 'chalk';
+import ora from 'ora';
 
-const getToken = require('../utils/getToken');
-const handleCliError = require('../utils/errorHandler');
+import getToken from '../utils/getToken.js';
+import handleCliError from '../utils/errorHandler.js';
 
 async function handleHistory({ userId }) {
   try {
@@ -40,4 +40,4 @@ async function handleHistory({ userId }) {
   }
 }
 
-module.exports = handleHistory;
+export default handleHistory;

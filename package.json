@@ -1,6 +1,7 @@
 {
   "name": "dev-helper-ai",
   "version": "1.0.0",
+  "type": "module",
   "bin": {
     "dev-helper": "./bin/dev-helper.js"
   },
@@ -19,6 +20,7 @@
     "ignore": "^7.0.5",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
+    "openai": "^5.20.3",
     "ora": "^5.4.1",
     "react-redux": "^9.2.0"
   },

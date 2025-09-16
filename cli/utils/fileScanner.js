@@ -1,9 +1,9 @@
 // utils/fileScanner.js
 
-const fg = require("fast-glob");
-const fs = require("fs");
-const path = require("path");
-const ignore = require("ignore");
+import fg from "fast-glob";
+import fs from "fs";
+import path from "path";
+import ignore from "ignore";
 
 /**
  * Reads and parses .gitignore from the provided directory
@@ -73,4 +73,4 @@ async function scanFiles({
   return results;
 }
 
-module.exports = { scanFiles };
+export { scanFiles };

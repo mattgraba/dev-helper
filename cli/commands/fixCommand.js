@@ -1,7 +1,7 @@
-const { handleFixBasic, handleFixWithContext } = require('./fixHandlers');
-const handleWithContext = require('../utils/contextHandlerWrapper');
+import { handleFixBasic, handleFixWithContext } from './fixHandlers.js';
+import handleWithContext from '../utils/contextHandlerWrapper.js';
 
-module.exports = (program) => {
+export default (program) => {
   program
     .command('fix')
     .alias('f')

@@ -18,5 +18,5 @@ function extractExplanationAndFix(aiResponse) {
     return { explanation, fix };
   }
   
-  module.exports = extractExplanationAndFix;
+  export default extractExplanationAndFix;
   

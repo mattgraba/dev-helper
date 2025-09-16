@@ -1,11 +1,11 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const readline = require('readline');
-const axios = require('axios');
-const chalk = require('chalk');
-const ora = require('ora');
-const handleCliError = require('../utils/errorHandler');
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import readline from 'readline';
+import axios from 'axios';
+import chalk from 'chalk';
+import ora from 'ora';
+import handleCliError from '../utils/errorHandler.js';
 
 const CONFIG_DIR = path.join(os.homedir(), '.dev-helper');
 const CONFIG_FILE = path.join(CONFIG_DIR, 'config.json');
@@ -40,4 +40,4 @@ async function handleLogin() {
   }
 }
 
-module.exports = handleLogin;
+export default handleLogin;

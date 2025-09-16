@@ -1,7 +1,7 @@
-const { handleExplainBasic, handleExplainWithContext } = require('./explainHandlers');
-const handleWithContext = require('../utils/contextHandlerWrapper');
+import { handleExplainBasic, handleExplainWithContext } from './explainHandlers.js';
+import handleWithContext from '../utils/contextHandlerWrapper.js';
 
-module.exports = (program) => {
+export default (program) => {
   program
     .command('explain')
     .alias('e')

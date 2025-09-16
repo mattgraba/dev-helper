@@ -1,13 +1,13 @@
-const fs = require('fs');
-const path = require('path');
-const axios = require('axios');
-const chalk = require('chalk');
-const ora = require('ora');
+import fs from 'fs';
+import path from 'path';
+import axios from 'axios';
+import chalk from 'chalk';
+import ora from 'ora';
 
-const getToken = require('../utils/getToken');
-const { checkFileExists } = require('../utils/fsUtils');
-const handleCliError = require('../utils/errorHandler');
-const saveToHistory = require('../utils/historySaver');
+import getToken from '../utils/getToken.js';
+import { checkFileExists } from '../utils/fsUtils.js';
+import handleCliError from '../utils/errorHandler.js';
+import saveToHistory from '../utils/historySaver.js';
 
 async function handleScaffoldBasic({ name, outputPath }) {
   try {
@@ -48,7 +48,7 @@ async function handleScaffoldBasic({ name, outputPath }) {
   }
 }
 
-module.exports = {
+export {
   handleScaffoldBasic,
 };
 

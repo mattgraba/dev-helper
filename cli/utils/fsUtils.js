@@ -1,6 +1,6 @@
 // utils/fsUtils.js
-const fs = require('fs');
-const chalk = require('chalk');
+import fs from 'fs';
+import chalk from 'chalk';
 
 function checkFileExists(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -10,4 +10,4 @@ function checkFileExists(filePath) {
   return true;
 }
 
-module.exports = { checkFileExists };
+export { checkFileExists };

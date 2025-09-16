@@ -7,7 +7,7 @@ function estimateTokens(text) {
     return parts.reduce((sum, part) => sum + estimateTokens(part || ''), 0);
   }
   
-  module.exports = {
+  export {
     estimateTokens,
     estimateTotalTokens,
   };

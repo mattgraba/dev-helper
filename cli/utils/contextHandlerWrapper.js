@@ -1,4 +1,4 @@
-module.exports = async function handleWithContext({ options, handleBasic, handleWithContext }) {
+export default async function handleWithContext({ options, handleBasic, handleWithContext }) {
   const {
     file: filePath,
     name: componentName,

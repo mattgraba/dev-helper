@@ -1,7 +1,7 @@
-const { handleAnalyzeBasic, handleAnalyzeWithContext } = require('./analyzeHandlers');
-const handleWithContext = require('../utils/contextHandlerWrapper');
+import { handleAnalyzeBasic, handleAnalyzeWithContext } from './analyzeHandlers.js';
+import handleWithContext from '../utils/contextHandlerWrapper.js';
 
-module.exports = (program) => {
+export default (program) => {
   program
     .command('analyze')
     .alias('a')

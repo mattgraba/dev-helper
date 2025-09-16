@@ -1,6 +1,6 @@
-const axios = require('axios');
-const getToken = require('./getToken');
-const { jwtDecode } = require('jwt-decode');
+import axios from 'axios';
+import getToken from './getToken.js';
+import { jwtDecode } from 'jwt-decode';
 
 async function saveToHistory({ command, input, output }) {
   try {
@@ -27,5 +27,5 @@ async function saveToHistory({ command, input, output }) {
   }
 }
 
-module.exports = saveToHistory;
+export default saveToHistory;
 

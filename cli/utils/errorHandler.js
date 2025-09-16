@@ -1,5 +1,5 @@
 // utils/errorHandler.js
-const chalk = require('chalk');
+import chalk from 'chalk';
 
 function handleCliError(spinner, err, fallbackMessage) {
   if (spinner && spinner.isSpinning) spinner.fail(fallbackMessage);
@@ -14,4 +14,4 @@ function handleCliError(spinner, err, fallbackMessage) {
   }
 }
 
-module.exports = handleCliError;
+export default handleCliError;

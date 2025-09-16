@@ -10,6 +10,21 @@ printf "$USER_ID\n" | dev-helper login
 if [ $? -ne 0 ]; then echo "❌ Login failed"; exit 1; fi
 echo "✅ Login passed"
 
+echo "=== Compliance Project Tests ==="
+
+# Analyze single audit log
+echo "-> Testing compliance analyze-audit"
+if dev-helper compliance analyze-audit tests/sample-audit.json > /tmp/compliance-output.json; then
+  if grep -q "summary" /tmp/compliance-output.json && grep -q "complianceGate" /tmp/compliance-output.json; then
+    echo -e "\033[0;32m[PASS]\033[0m compliance analyze-audit returned enriched log"
+  else
+    echo -e "\033[0;31m[FAIL]\033[0m compliance analyze-audit missing expected fields"
+    cat /tmp/compliance-output.json
+  fi
+else
+  echo -e "\033[0;31m[FAIL]\033[0m compliance analyze-audit command failed to run"
+fi
+
 # Analyze
 echo "🔍 Testing analyze..."
 dev-helper analyze -f ./tests/sample-bug.js -l javascript

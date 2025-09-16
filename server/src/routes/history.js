@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Response = require('../models/Response');
-const authMiddleware = require('../middleware/authMiddleware');
+import Response from '../models/Response.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 router.get('/', authMiddleware, async (req, res) => {
   try {
@@ -36,4 +36,4 @@ router.post('/', authMiddleware, async (req, res) => {
 });
 
 
-module.exports = router;
+export default router;

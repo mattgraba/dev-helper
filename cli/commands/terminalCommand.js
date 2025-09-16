@@ -1,7 +1,7 @@
-const { handleTerminalBasic, handleTerminalWithContext } = require('./terminalHandlers');
-const handleWithContext = require('../utils/contextHandlerWrapper');
+import { handleTerminalBasic, handleTerminalWithContext } from './terminalHandlers.js';
+import handleWithContext from '../utils/contextHandlerWrapper.js';
 
-module.exports = (program) => {
+export default (program) => {
   program
     .command('terminal')
     .alias('t')

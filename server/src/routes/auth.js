@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 const SECRET_KEY = process.env.JWT_SECRET || 'default-secret-key';
 
@@ -15,4 +15,4 @@ router.post('/login', (req, res) => {
   res.json({ token });
 });
 
-module.exports = router;
+export default router;

@@ -1,6 +1,6 @@
-const { handleScaffoldBasic } = require('./scaffoldHandlers');
+import { handleScaffoldBasic } from './scaffoldHandlers.js';
 
-module.exports = (program) => {
+export default (program) => {
   program
     .command('scaffold')
     .alias('s')

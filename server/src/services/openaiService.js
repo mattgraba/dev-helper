@@ -1,6 +1,6 @@
-const { OpenAI } = require('openai');
+import { OpenAI } from 'openai';
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const { estimateTotalTokens } = require('../utils/tokenEstimator');
+import { estimateTotalTokens } from '../utils/tokenEstimator.js';
 
 const TOKEN_LIMIT = 8000; // for gpt-4 8k model; lower than hard max for safety
 
@@ -70,7 +70,7 @@ async function sendPrompt(prompt) {
   return completion.choices[0].message.content;
 }
 
-module.exports = {
+export {
   getAIResponse,
   sendPrompt,
 };

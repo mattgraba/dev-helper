@@ -1,6 +1,6 @@
-const handleHistory = require('./historyHandlers');
+import handleHistory from './historyHandlers.js';
 
-module.exports = (program) => {
+export default (program) => {
   program
     .command('history')
     .alias('h')

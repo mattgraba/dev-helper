@@ -1,9 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { sendPrompt } = require('../services/openaiService');
-const extractExplanationAndFix = require('../utils/extractExplanationAndFix');
-const Response = require('../models/Response');
-const authMiddleware = require('../middleware/authMiddleware');
+import { sendPrompt } from '../services/openaiService.js';
+import extractExplanationAndFix from '../utils/extractExplanationAndFix.js';
+import Response from '../models/Response.js';
+import authMiddleware from '../middleware/authMiddleware.js';
 
 router.post('/', authMiddleware, async (req, res) => {
   const { errorText, language = 'JavaScript', contextFiles = [] } = req.body;
@@ -45,5 +45,5 @@ ${contextText ? `Context:\n\n${contextText}` : ''}
   }
 });
 
-module.exports = router;
+export default router;
 

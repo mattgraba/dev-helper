@@ -1,14 +1,14 @@
-const fs = require('fs');
-const path = require('path');
-const axios = require('axios');
-const chalk = require('chalk');
-const ora = require('ora');
+import fs from 'fs';
+import path from 'path';
+import axios from 'axios';
+import chalk from 'chalk';
+import ora from 'ora';
 
-const getToken = require('../utils/getToken');
-const { scanFiles } = require('../utils/fileScanner');
-const { checkFileExists } = require('../utils/fsUtils');
-const handleCliError = require('../utils/errorHandler');
-const saveToHistory = require('../utils/historySaver');
+import getToken from '../utils/getToken.js';
+import { scanFiles } from '../utils/fileScanner.js';
+import { checkFileExists } from '../utils/fsUtils.js';
+import handleCliError from '../utils/errorHandler.js';
+import saveToHistory from '../utils/historySaver.js';
 
 async function handleFixBasic({ filePath, language, outputPath }) {
   try {
@@ -100,7 +100,7 @@ async function handleFixWithContext({ filePath, language, outputPath }) {
   }
 }
 
-module.exports = {
+export {
   handleFixBasic,
   handleFixWithContext,
 };

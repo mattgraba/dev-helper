@@ -1,9 +1,12 @@
 // server/src/index.js
 
-const express = require('express');
-const cors = require('cors');
-const mongoose = require('mongoose');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import mongoose from 'mongoose';
+import dotenv from 'dotenv';
+import path from `path`;
+
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
 const app = express();
 
@@ -12,14 +15,14 @@ app.use(cors());
 app.use(express.json());
 
 // Route Imports
-const authRoutes = require('./routes/auth');
-const analyzeRoutes = require('./routes/analyze');
-const explainRoutes = require('./routes/explain');
-const fixRoutes = require('./routes/fix');
-const generateRoutes = require('./routes/generate');
-const scaffoldRoutes = require('./routes/scaffold');
-const terminalRoutes = require('./routes/terminal');
-const historyRoutes = require('./routes/history');
+import authRoutes from './routes/auth.js';
+import analyzeRoutes from './routes/analyze.js';
+import explainRoutes from './routes/explain.js';
+import fixRoutes from './routes/fix.js';
+import generateRoutes from './routes/generate.js';
+import scaffoldRoutes from './routes/scaffold.js';
+import terminalRoutes from './routes/terminal.js';
+import historyRoutes from './routes/history.js';
 
 
 // Mount Routes

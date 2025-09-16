@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const ResponseSchema = new mongoose.Schema({
   userId: {
@@ -27,4 +27,4 @@ const ResponseSchema = new mongoose.Schema({
 
 ResponseSchema.index({ userId: 1, timestamp: -1 });
 
-module.exports = mongoose.model('Response', ResponseSchema);
+export default mongoose.model('Response', ResponseSchema);

@@ -1,6 +1,6 @@
-const handleLogin = require('./loginHandlers');
+import handleLogin from './loginHandlers.js';
 
-module.exports = (program) => {
+export default (program) => {
   program
     .command('login')
     .alias('l')

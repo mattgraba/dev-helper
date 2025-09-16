@@ -1,4 +1,4 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
 // Load secret from env or fallback
 const JWT_SECRET = process.env.JWT_SECRET || 'dev-helper-secret';   // Ensures only valid, signed tokens are accepted
@@ -22,4 +22,4 @@ function authMiddleware(req, res, next) {
   }
 }
 
-module.exports = authMiddleware;    // Exports the function so it can be used in other files
+export default authMiddleware;    // Exports the function so it can be used in other files

@@ -1,6 +1,6 @@
-const { handleGenerateBasic } = require('./generateHandlers');
+import { handleGenerateBasic } from './generateHandlers.js';
 
-module.exports = (program) => {
+export default (program) => {
   program
     .command('generate')
     .alias('g')
