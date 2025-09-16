@@ -1,4 +1,7 @@
-# ADR 0003 — AI Audit Automation in Dev Helper
+# ADR 0001 — AI Audit Automation Sandbox in Dev Helper
+
+## Date
+2025-09-16  
 
 ## Status
 Accepted
