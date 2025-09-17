@@ -1,6 +1,8 @@
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
+import { parseComplianceResponse } from "./utils/parseComplianceResponse.js";
+import { normalizeComplianceResponse } from "./utils/normalizeComplianceResponse.js";
 
 // lazy initialization of OpenAI client
 let client = null;
@@ -27,16 +29,33 @@ export async function handleAnalyzeAudit(filePath) {
 
     // 2. Build the prompt
     const prompt = `
-      You are an AI compliance assistant. Summarize the following audit log entry 
-      for a regulator. Include:
-      - A plain-language summary
-      - Any detected deviations
-      - Which compliance gates it maps to
-      
-      Respond in strict JSON with keys: summary, deviations, mappedGates.
+    You are an AI compliance assistant. Review the following audit log entry 
+    and produce a structured compliance analysis. 
 
-      Audit Log Data:
-      ${JSON.stringify(auditLog, null, 2)}
+    ⚠️ Respond ONLY in strict JSON, matching this schema exactly:
+    {
+      "auditId": string,                        // unique audit log ID
+      "timestamp": string,                      // ISO 8601 timestamp
+      "analyzedBy": "AI",                       // literal value "AI"
+      "summary": string,                        // plain-language overview
+      "issues": [                               // detected deviations/issues
+        {
+          "id": string (uuid, optional),
+          "message": string,                    // description of the issue
+          "severity": "low"|"medium"|"high"|"critical" (optional),
+          "regulation": string (optional),      // e.g. OSHA, METRC, etc.
+          "suggestion": string (optional)       // AI-generated recommendation
+        }
+      ],
+      "mappedGates": [string],                  // compliance gates like "QA/QC", "OSHA"
+      "metadata": {                             // optional info
+        "sourceFile": string (optional),
+        "tokensUsed": number (optional)
+      }
+    }
+
+    Audit Log Data:
+    ${JSON.stringify(auditLog, null, 2)}
     `;
 
     // 3. Call OpenAI API
@@ -57,8 +76,17 @@ export async function handleAnalyzeAudit(filePath) {
       throw new Error(`Failed to parse OpenAI response as JSON: ${raw}`);
     }
 
-    // 5. Return structured response
-    return structured;
+    // ✅ Normalize before validation (optional in prod)
+    // ✅ Strict/resilient behavior depends on env flag
+    const normalized = normalizeComplianceResponse(structured);
+
+    // 5. Validate against schema
+    const validated = parseComplianceResponse(structured);
+    console.log("✅ Valid compliance response:", normalized )
+
+    // 6. Return validated result (never expose raw response)
+    return validated;
+
   } catch (err) {
     console.error("❌ Error in handleAnalyzeAudit:", err.message);
     throw err;
