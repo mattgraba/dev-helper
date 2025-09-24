@@ -1,0 +1,13 @@
+# Never publish dependencies
+**/node_modules
+**/package-lock.json
+
+# Never publish tests or logs
+**/tests
+**/logs
+*.log
+
+# Local/dev configs
+.dockerignore
+docker-compose.yml
+Dockerfile
