@@ -1,5 +1,5 @@
 {
-  "name": "dev-helper",
+  "name": "@mattgraba/dev-helper",
   "version": "1.0.3",
   "type": "module",
   "bin": {
