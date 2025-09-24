@@ -1,6 +1,6 @@
 {
   "name": "dev-helper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "bin": {
     "dev-helper": "./bin/dev-helper.js"
@@ -19,7 +19,13 @@
     "dev:server": "nodemon server/src/index.js",
     "test": "jest --detectOpenHandles --forceExit"
   },
-  "keywords": ["cli", "developer-tools", "ai", "debugging", "productivity"],
+  "keywords": [
+    "cli",
+    "developer-tools",
+    "ai",
+    "debugging",
+    "productivity"
+  ],
   "author": "Matt Graba",
   "license": "MIT",
   "repository": {
