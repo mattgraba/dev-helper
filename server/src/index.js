@@ -11,7 +11,22 @@ dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 const app = express();
 
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+  'https://dev-helper-zeta.vercel.app',
+  'http://localhost:5173', // Vite dev server
+  'http://localhost:3000',
+];
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, etc.) or from allowed origins
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // Route Imports
@@ -23,16 +38,16 @@ import generateRoutes from './routes/generate.js';
 import scaffoldRoutes from './routes/scaffold.js';
 import terminalRoutes from './routes/terminal.js';
 import historyRoutes from './routes/history.js';
-
+import { aiRateLimiter, authRateLimiter } from './middleware/rateLimiter.js';
 
 // Mount Routes
-app.use('/auth', authRoutes);
-app.use('/analyze', analyzeRoutes);
-app.use('/explain', explainRoutes);
-app.use('/fix', fixRoutes);
-app.use('/generate', generateRoutes);
-app.use('/scaffold', scaffoldRoutes);
-app.use('/terminal', terminalRoutes);
+app.use('/auth', authRateLimiter, authRoutes);
+app.use('/analyze', aiRateLimiter, analyzeRoutes);
+app.use('/explain', aiRateLimiter, explainRoutes);
+app.use('/fix', aiRateLimiter, fixRoutes);
+app.use('/generate', aiRateLimiter, generateRoutes);
+app.use('/scaffold', aiRateLimiter, scaffoldRoutes);
+app.use('/terminal', aiRateLimiter, terminalRoutes);
 app.use('/history', historyRoutes);
 
 // Server Start

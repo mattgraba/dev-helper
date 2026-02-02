@@ -4,6 +4,7 @@ import { sendPrompt } from '../services/openaiService.js';
 import extractExplanationAndFix from '../utils/extractExplanationAndFix.js';
 import Response from '../models/Response.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { handleOpenAIError } from '../utils/openaiErrorHandler.js';
 
 router.post('/', authMiddleware, async (req, res) => {
   const { errorText, language = 'JavaScript', contextFiles = [] } = req.body;
@@ -45,8 +46,13 @@ ${contextText ? `Context:\n\n${contextText}` : ''}
 
     res.json({ explanation, fix });
   } catch (err) {
-    console.error('Analyze route error:', err);
-    res.status(500).json({ error: 'Failed to analyze error' });
+    const { status, message, retryAfter } = handleOpenAIError(err);
+    const response = { error: message };
+    if (retryAfter) {
+      response.retryAfter = retryAfter;
+      res.set('Retry-After', retryAfter.toString());
+    }
+    return res.status(status).json(response);
   }
 });
 

@@ -3,6 +3,7 @@ const router = express.Router();
 import { sendPrompt } from '../services/openaiService.js';
 import Response from '../models/Response.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { handleOpenAIError } from '../utils/openaiErrorHandler.js';
 
 router.post('/', authMiddleware, async (req, res) => {
   const { codeSnippet, language = 'JavaScript', contextFiles = [] } = req.body;
@@ -44,8 +45,13 @@ ${contextText ? `Additional context:\n\n${contextText}` : ''}
 
     res.json({ explanation });
   } catch (err) {
-    console.error('Explain route error:', err);
-    res.status(500).json({ error: 'Failed to generate explanation' });
+    const { status, message, retryAfter } = handleOpenAIError(err);
+    const response = { error: message };
+    if (retryAfter) {
+      response.retryAfter = retryAfter;
+      res.set('Retry-After', retryAfter.toString());
+    }
+    return res.status(status).json(response);
   }
 });
 

@@ -3,6 +3,7 @@ const router = express.Router();
 import { sendPrompt } from '../services/openaiService.js';
 import Response from '../models/Response.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { handleOpenAIError } from '../utils/openaiErrorHandler.js';
 
 router.post('/', authMiddleware, async (req, res) => {
   const { codeSnippet, language = 'JavaScript', contextFiles = [] } = req.body;
@@ -43,8 +44,13 @@ ${contextText ? `Here is additional context:\n\n${contextText}` : ''}
 
     res.json({ fixedCode });
   } catch (err) {
-    console.error('Fix route error:', err);
-    res.status(500).json({ error: 'Failed to fix code' });
+    const { status, message, retryAfter } = handleOpenAIError(err);
+    const response = { error: message };
+    if (retryAfter) {
+      response.retryAfter = retryAfter;
+      res.set('Retry-After', retryAfter.toString());
+    }
+    return res.status(status).json(response);
   }
 });
 

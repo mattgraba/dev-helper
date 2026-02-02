@@ -1,6 +1,23 @@
-import { useState } from 'react';
-import { Sparkles, AlertCircle, CheckCircle } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Sparkles, AlertCircle, CheckCircle, Upload } from 'lucide-react';
 import api from '@/utils/api';
+
+// Map file extensions to languages
+const extensionToLanguage = {
+  js: 'JavaScript',
+  jsx: 'JavaScript',
+  ts: 'TypeScript',
+  tsx: 'TypeScript',
+  py: 'Python',
+  java: 'Java',
+  cpp: 'C++',
+  cc: 'C++',
+  cxx: 'C++',
+  go: 'Go',
+  rs: 'Rust',
+  php: 'PHP',
+  rb: 'Ruby',
+};
 
 export default function AnalyzePage() {
   const [errorText, setErrorText] = useState('');
@@ -9,6 +26,53 @@ export default function AnalyzePage() {
   const [fix, setFix] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fileName, setFileName] = useState('');
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleFileUpload = (file) => {
+    if (!file) return;
+
+    // Check file size (limit to 100KB for reasonable token usage)
+    if (file.size > 100 * 1024) {
+      setError('File too large. Please upload a file smaller than 100KB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      setErrorText(e.target.result);
+      setFileName(file.name);
+      setError(null);
+
+      // Auto-detect language from file extension
+      const ext = file.name.split('.').pop()?.toLowerCase();
+      if (ext && extensionToLanguage[ext]) {
+        setLanguage(extensionToLanguage[ext]);
+      }
+    };
+    reader.onerror = () => {
+      setError('Failed to read file. Please try again.');
+    };
+    reader.readAsText(file);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    handleFileUpload(file);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +93,9 @@ export default function AnalyzePage() {
       setFix(res.data.fix || res.data.fixedCode || '');
     } catch (err) {
       console.error(err);
-      setError('Failed to analyze code. Please try again.');
+      // Show user-friendly error message from server if available
+      const serverError = err.response?.data?.error;
+      setError(serverError || 'Failed to analyze code. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -133,6 +199,57 @@ export default function AnalyzePage() {
               </select>
             </div>
 
+            {/* File Upload */}
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: 'rgb(200, 200, 200)',
+                  marginBottom: '8px',
+                }}
+              >
+                Upload File (optional)
+              </label>
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                style={{
+                  width: '100%',
+                  padding: '24px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgb(9, 9, 11)',
+                  border: isDragging ? '2px dashed rgb(168, 85, 247)' : '2px dashed rgb(39, 39, 42)',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  transition: 'border-color 0.2s',
+                }}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".js,.jsx,.ts,.tsx,.py,.java,.cpp,.cc,.cxx,.go,.rs,.php,.rb,.txt"
+                  onChange={(e) => handleFileUpload(e.target.files[0])}
+                  style={{ display: 'none' }}
+                />
+                <Upload style={{ width: 24, height: 24, color: 'rgb(119, 119, 119)', margin: '0 auto 8px' }} />
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: 'rgb(119, 119, 119)', margin: 0 }}>
+                  {fileName ? (
+                    <span style={{ color: 'rgb(74, 222, 128)' }}>{fileName}</span>
+                  ) : (
+                    <>Drag & drop a file or <span style={{ color: 'rgb(168, 85, 247)' }}>browse</span></>
+                  )}
+                </p>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '12px', color: 'rgb(80, 80, 80)', margin: '4px 0 0' }}>
+                  Supports .js, .ts, .py, .java, .cpp, .go, .rs, .php, .rb (max 100KB)
+                </p>
+              </div>
+            </div>
+
             {/* Code Input */}
             <div>
               <label
@@ -145,12 +262,15 @@ export default function AnalyzePage() {
                   marginBottom: '8px',
                 }}
               >
-                Your Code
+                Your Code {fileName && <span style={{ color: 'rgb(119, 119, 119)', fontWeight: 400 }}>(from {fileName})</span>}
               </label>
               <textarea
                 value={errorText}
-                onChange={(e) => setErrorText(e.target.value)}
-                placeholder="Paste your buggy code here..."
+                onChange={(e) => {
+                  setErrorText(e.target.value);
+                  if (fileName) setFileName(''); // Clear file name if user edits manually
+                }}
+                placeholder="Paste your buggy code here or upload a file above..."
                 style={{
                   width: '100%',
                   minHeight: '200px',

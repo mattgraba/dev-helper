@@ -3,6 +3,7 @@ const router = express.Router();
 import { sendPrompt } from '../services/openaiService.js';
 import Response from '../models/Response.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { handleOpenAIError } from '../utils/openaiErrorHandler.js';
 
 router.post('/', authMiddleware, async (req, res) => {
   const { name } = req.body;
@@ -36,8 +37,13 @@ Include comments and clear structure.
 
     res.json({ scaffoldCode });
   } catch (err) {
-    console.error('Scaffold route error:', err);
-    res.status(500).json({ error: 'Failed to generate scaffold' });
+    const { status, message, retryAfter } = handleOpenAIError(err);
+    const response = { error: message };
+    if (retryAfter) {
+      response.retryAfter = retryAfter;
+      res.set('Retry-After', retryAfter.toString());
+    }
+    return res.status(status).json(response);
   }
 });
 

@@ -3,6 +3,7 @@ const router = express.Router();
 import { sendPrompt } from '../services/openaiService.js';
 import Response from '../models/Response.js';
 import authMiddleware from '../middleware/authMiddleware.js';
+import { handleOpenAIError } from '../utils/openaiErrorHandler.js';
 
 router.post('/', authMiddleware, async (req, res) => {
   const { goal, context } = req.body;
@@ -39,8 +40,13 @@ ${context ? `\n\nProject context:\n${context}` : ''}
 
     res.json({ commands });
   } catch (err) {
-    console.error('Terminal route error:', err);
-    res.status(500).json({ error: 'Failed to generate terminal commands' });
+    const { status, message, retryAfter } = handleOpenAIError(err);
+    const response = { error: message };
+    if (retryAfter) {
+      response.retryAfter = retryAfter;
+      res.set('Retry-After', retryAfter.toString());
+    }
+    return res.status(status).json(response);
   }
 });
 
