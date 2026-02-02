@@ -147,36 +147,11 @@ dev-helper history
 
 ---
 
-## 🖼 Screenshots & Demo
-
-### CLI in Action
-```bash
-# Example: Analyzing a buggy file with context-aware mode
-dev-helper analyze --filePath index.js --context
-```
-
-Placeholders:
-Web App – Login
-
-Web App – Analyze & Fix
-
-Web App – History
-
----
 
 ## 🧭 Core Philosophy
 
 Dev Helper is built to accelerate engineers without replacing their thinking.
 It empowers intentional usage, promotes critical reasoning, augments fundamentals, and resists the “vibe-coding” shortcuts common in IDE auto-complete tools.
-
----
-
-## 📈 Roadmap
-- Web UI polish (About, Contact, Analyze, History pages)
-- Deployment (Frontend → Vercel, Backend → Render/Heroku)
-- Filters, search, and pagination in history
-- Multi-user accounts with RBAC
-- AI-driven context trimming for large repos
 
 ---
 
