@@ -1,97 +1,261 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import api from '@/utils/api';
-import { LogInIcon } from "lucide-react";
+import { LogIn } from 'lucide-react';
 
 export default function LoginForm({ onLoginSuccess }) {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const navigate = useNavigate();
-    const location = useLocation();
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
-    // Get the page they were trying to access, default to /analyze
-    const from = location.state?.from || '/analyze';
+  const from = location.state?.from || '/analyze';
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError(null);
-        setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
 
-        try {
-            const res = await api.post('/auth/login', { username, password });
-            const token = res.data.token;
-            localStorage.setItem('dev-helper-token', token);
-            onLoginSuccess(token);
-            // Redirect to the page they were trying to access
-            navigate(from, { replace: true });
-          } catch (err) {
-            console.error(err);
-            setError(err.response?.data?.error || 'Login failed. Please try again.');
-          } finally {
-            setLoading(false);
-          }
-        };
+    try {
+      const res = await api.post('/auth/login', { username, password });
+      const token = res.data.token;
+      localStorage.setItem('dev-helper-token', token);
+      onLoginSuccess(token);
+      navigate(from, { replace: true });
+    } catch (err) {
+      console.error(err);
+      setError(err.response?.data?.error || 'Login failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    return (
-        <div className="min-h-screen flex items-center justify-center p-4 bg-black">
-        <Card className="w-full max-w-md shadow-xl">
-            <CardContent className="p-6 space-y-4">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold">Login to Dev Helper AI</h1>
-              <p className="text-gray-400 text-sm mt-2">
-                Enter your credentials to continue
-              </p>
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        width: '100%',
+        backgroundColor: '#000',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+      }}
+    >
+      <div style={{ width: '480px', maxWidth: '100%' }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h1
+            style={{
+              fontFamily: 'Inter Variable, Inter, sans-serif',
+              fontSize: '36px',
+              fontWeight: 700,
+              letterSpacing: '-0.05em',
+              color: 'rgb(255, 255, 255)',
+              marginBottom: '12px',
+            }}
+          >
+            Welcome Back
+          </h1>
+          <p
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              color: 'rgb(119, 119, 119)',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Login to continue analyzing code
+          </p>
+        </div>
+
+        {/* Form Card */}
+        <div
+          style={{
+            backgroundColor: '#0d0d0d',
+            borderRadius: '20px',
+            padding: '40px',
+          }}
+        >
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            {/* Username Field */}
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: 'rgb(200, 200, 200)',
+                  marginBottom: '8px',
+                }}
+              >
+                Username
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgb(9, 9, 11)',
+                  color: 'rgb(255, 255, 255)',
+                  border: '1px solid rgb(39, 39, 42)',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
+              />
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Username
-                  </label>
-                  <Input
-                    className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-zinc-400 border border-zinc-700 focus:border-teal-500 focus:ring-2 focus:ring-teal-400 transition"
-                    type="text"
-                    placeholder="Enter your username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-1">
-                    Password
-                  </label>
-                  <Input
-                    className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-zinc-400 border border-zinc-700 focus:border-teal-500 focus:ring-2 focus:ring-teal-400 transition"
-                    type="password"
-                    placeholder="Enter your password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                {error && <p className="text-red-500 text-sm">{error}</p>}
-                <Button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full py-3 rounded-lg bg-gradient-to-tr from-teal-500 to-indigo-500 text-white font-semibold shadow-md hover:scale-105 hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <LogInIcon className="w-5 h-5" />
-                    {loading ? 'Logging in...' : 'Login'}
-                </Button>
-            </form>
-            <div className="text-center text-sm text-gray-400">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-indigo-400 hover:underline">
-                Register here
+
+            {/* Password Field */}
+            <div>
+              <label
+                style={{
+                  display: 'block',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: 'rgb(200, 200, 200)',
+                  marginBottom: '8px',
+                }}
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgb(9, 9, 11)',
+                  color: 'rgb(255, 255, 255)',
+                  border: '1px solid rgb(39, 39, 42)',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
+              />
+            </div>
+
+            {/* Error Message */}
+            {error && (
+              <div
+                style={{
+                  backgroundColor: 'rgba(153, 27, 27, 0.2)',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  border: '1px solid rgb(127, 29, 29)',
+                }}
+              >
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: 'rgb(248, 113, 113)', margin: 0 }}>
+                  {error}
+                </p>
+              </div>
+            )}
+
+            {/* Forgot Password Link */}
+            <div style={{ textAlign: 'right' }}>
+              <Link
+                to="/forgot-password"
+                style={{
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '13px',
+                  color: 'rgb(168, 85, 247)',
+                  textDecoration: 'none',
+                  fontWeight: 500,
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.textDecoration = 'underline';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.textDecoration = 'none';
+                }}
+              >
+                Forgot password?
               </Link>
             </div>
-            </CardContent>
-        </Card>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '16px',
+                borderRadius: '9999px',
+                backgroundColor: loading ? 'rgb(39, 39, 42)' : 'rgb(25, 25, 25)',
+                color: 'white',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 600,
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'all 0.2s',
+                opacity: loading ? 0.5 : 1,
+              }}
+              onMouseOver={(e) => {
+                if (!loading) {
+                  e.target.style.backgroundColor = 'white';
+                  e.target.style.color = 'black';
+                }
+              }}
+              onMouseOut={(e) => {
+                if (!loading) {
+                  e.target.style.backgroundColor = 'rgb(25, 25, 25)';
+                  e.target.style.color = 'white';
+                }
+              }}
+            >
+              <LogIn style={{ width: 18, height: 18 }} />
+              {loading ? 'Logging in...' : 'Login'}
+            </button>
+          </form>
+
+          {/* Register Link */}
+          <div
+            style={{
+              textAlign: 'center',
+              marginTop: '24px',
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              color: 'rgb(119, 119, 119)',
+            }}
+          >
+            Don't have an account?{' '}
+            <Link
+              to="/register"
+              style={{
+                color: 'rgb(168, 85, 247)',
+                textDecoration: 'none',
+                fontWeight: 500,
+              }}
+              onMouseOver={(e) => {
+                e.target.style.textDecoration = 'underline';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.textDecoration = 'none';
+              }}
+            >
+              Register here
+            </Link>
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }

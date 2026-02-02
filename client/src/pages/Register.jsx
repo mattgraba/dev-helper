@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import api from '@/utils/api';
 import { UserPlus } from 'lucide-react';
 
@@ -64,23 +61,68 @@ export default function RegisterPage({ onRegister }) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-black">
-      <Card className="w-full max-w-md shadow-xl">
-        <CardContent className="p-6 space-y-4">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold">Create Account</h1>
-            <p className="text-gray-400 text-sm mt-2">
-              Join Dev Helper AI to start analyzing code
-            </p>
-          </div>
+    <div
+      style={{
+        minHeight: '100vh',
+        width: '100%',
+        backgroundColor: '#000',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+      }}
+    >
+      <div style={{ width: '480px', maxWidth: '100%' }}>
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '40px' }}>
+          <h1
+            style={{
+              fontFamily: 'Inter Variable, Inter, sans-serif',
+              fontSize: '36px',
+              fontWeight: 700,
+              letterSpacing: '-0.05em',
+              color: 'rgb(255, 255, 255)',
+              marginBottom: '12px',
+            }}
+          >
+            Create Account
+          </h1>
+          <p
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              color: 'rgb(119, 119, 119)',
+              letterSpacing: '-0.01em',
+            }}
+          >
+            Join Dev Helper AI to start analyzing code
+          </p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+        {/* Form Card */}
+        <div
+          style={{
+            backgroundColor: '#0d0d0d',
+            borderRadius: '20px',
+            padding: '40px',
+          }}
+        >
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Username Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label
+                style={{
+                  display: 'block',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: 'rgb(200, 200, 200)',
+                  marginBottom: '8px',
+                }}
+              >
                 Username
               </label>
-              <Input
-                className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-zinc-400 border border-zinc-700 focus:border-teal-500 focus:ring-2 focus:ring-teal-400 transition"
+              <input
                 type="text"
                 name="username"
                 placeholder="Choose a username"
@@ -89,30 +131,70 @@ export default function RegisterPage({ onRegister }) {
                 required
                 minLength={3}
                 maxLength={30}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgb(9, 9, 11)',
+                  color: 'rgb(255, 255, 255)',
+                  border: '1px solid rgb(39, 39, 42)',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
               />
             </div>
 
+            {/* Email Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label
+                style={{
+                  display: 'block',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: 'rgb(200, 200, 200)',
+                  marginBottom: '8px',
+                }}
+              >
                 Email
               </label>
-              <Input
-                className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-zinc-400 border border-zinc-700 focus:border-teal-500 focus:ring-2 focus:ring-teal-400 transition"
+              <input
                 type="email"
                 name="email"
                 placeholder="your@email.com"
                 value={formData.email}
                 onChange={handleChange}
                 required
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgb(9, 9, 11)',
+                  color: 'rgb(255, 255, 255)',
+                  border: '1px solid rgb(39, 39, 42)',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
               />
             </div>
 
+            {/* Password Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label
+                style={{
+                  display: 'block',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: 'rgb(200, 200, 200)',
+                  marginBottom: '8px',
+                }}
+              >
                 Password
               </label>
-              <Input
-                className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-zinc-400 border border-zinc-700 focus:border-teal-500 focus:ring-2 focus:ring-teal-400 transition"
+              <input
                 type="password"
                 name="password"
                 placeholder="At least 6 characters"
@@ -120,44 +202,141 @@ export default function RegisterPage({ onRegister }) {
                 onChange={handleChange}
                 required
                 minLength={6}
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgb(9, 9, 11)',
+                  color: 'rgb(255, 255, 255)',
+                  border: '1px solid rgb(39, 39, 42)',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
               />
             </div>
 
+            {/* Confirm Password Field */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-1">
+              <label
+                style={{
+                  display: 'block',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  color: 'rgb(200, 200, 200)',
+                  marginBottom: '8px',
+                }}
+              >
                 Confirm Password
               </label>
-              <Input
-                className="w-full px-4 py-3 rounded-lg bg-zinc-800 text-white placeholder-zinc-400 border border-zinc-700 focus:border-teal-500 focus:ring-2 focus:ring-teal-400 transition"
+              <input
                 type="password"
                 name="confirmPassword"
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 required
+                style={{
+                  width: '100%',
+                  padding: '12px 16px',
+                  borderRadius: '12px',
+                  backgroundColor: 'rgb(9, 9, 11)',
+                  color: 'rgb(255, 255, 255)',
+                  border: '1px solid rgb(39, 39, 42)',
+                  fontFamily: 'Inter, sans-serif',
+                  fontSize: '14px',
+                  outline: 'none',
+                }}
               />
             </div>
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {/* Error Message */}
+            {error && (
+              <div
+                style={{
+                  backgroundColor: 'rgba(153, 27, 27, 0.2)',
+                  borderRadius: '12px',
+                  padding: '12px 16px',
+                  border: '1px solid rgb(127, 29, 29)',
+                }}
+              >
+                <p style={{ fontFamily: 'Inter, sans-serif', fontSize: '14px', color: 'rgb(248, 113, 113)', margin: 0 }}>
+                  {error}
+                </p>
+              </div>
+            )}
 
-            <Button
+            {/* Submit Button */}
+            <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg bg-gradient-to-tr from-teal-500 to-indigo-500 text-white font-semibold shadow-md hover:scale-105 hover:shadow-xl transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                width: '100%',
+                padding: '16px',
+                borderRadius: '9999px',
+                backgroundColor: loading ? 'rgb(39, 39, 42)' : 'rgb(25, 25, 25)',
+                color: 'white',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '14px',
+                fontWeight: 600,
+                border: 'none',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                transition: 'all 0.2s',
+                opacity: loading ? 0.5 : 1,
+              }}
+              onMouseOver={(e) => {
+                if (!loading) {
+                  e.target.style.backgroundColor = 'white';
+                  e.target.style.color = 'black';
+                }
+              }}
+              onMouseOut={(e) => {
+                if (!loading) {
+                  e.target.style.backgroundColor = 'rgb(25, 25, 25)';
+                  e.target.style.color = 'white';
+                }
+              }}
             >
-              <UserPlus className="w-5 h-5" />
+              <UserPlus style={{ width: 18, height: 18 }} />
               {loading ? 'Creating Account...' : 'Create Account'}
-            </Button>
+            </button>
           </form>
 
-          <div className="text-center text-sm text-gray-400">
+          {/* Login Link */}
+          <div
+            style={{
+              textAlign: 'center',
+              marginTop: '24px',
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              color: 'rgb(119, 119, 119)',
+            }}
+          >
             Already have an account?{' '}
-            <Link to="/login" className="text-indigo-400 hover:underline">
+            <Link
+              to="/login"
+              style={{
+                color: 'rgb(168, 85, 247)',
+                textDecoration: 'none',
+                fontWeight: 500,
+              }}
+              onMouseOver={(e) => {
+                e.target.style.textDecoration = 'underline';
+              }}
+              onMouseOut={(e) => {
+                e.target.style.textDecoration = 'none';
+              }}
+            >
               Login here
             </Link>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/Layout';
 import LoginPage from './pages/Login';
 import RegisterPage from './pages/Register';
+import ForgotPasswordPage from './pages/ForgotPassword';
 import HistoryPage from './pages/History';
 import NotFound from './pages/NotFound';
 import AnalyzePage from './pages/Analyze';
@@ -37,6 +38,7 @@ function App() {
         {/* Auth pages without layout */}
         <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
         <Route path="/register" element={<RegisterPage onRegister={handleLogin} />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
         {/* All other pages with layout */}
         <Route
