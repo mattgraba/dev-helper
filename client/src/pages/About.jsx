@@ -91,7 +91,7 @@ export default function About() {
               border: '1px solid rgb(39, 39, 42)',
             }}
           >
-            npm install -g dev-helper
+            npm install -g @mattgraba/dev-helper
           </pre>
         </div>
 
@@ -124,7 +124,7 @@ export default function About() {
               marginBottom: '12px',
             }}
           >
-            After installing, login to authenticate and receive your access token:
+            After installing, login with your Dev Helper account credentials:
           </p>
           <pre
             style={{
@@ -177,26 +177,36 @@ export default function About() {
             <CommandItem
               title="analyze"
               desc="Analyze an error or bug in a code file."
-              example="dev-helper analyze ./path/to/file.js"
+              example="dev-helper analyze -f ./path/to/file.js -l javascript"
             />
             <CommandItem
               title="explain"
               desc="Explain what a piece of code does in plain English."
-              example="dev-helper explain ./utils/complexFunction.py"
+              example="dev-helper explain -f ./utils/helper.py -l python"
             />
             <CommandItem
               title="fix"
               desc="Suggest a fix for a broken code snippet."
-              example="dev-helper fix ./src/failingComponent.tsx"
+              example="dev-helper fix -f ./src/component.tsx -l typescript"
             />
             <CommandItem
               title="generate"
-              desc="Generate boilerplate code (e.g. a React component or Express route)."
-              example="dev-helper generate react-component Button"
+              desc="Generate boilerplate code from a natural language description."
+              example='dev-helper generate -d "Create a React button component"'
+            />
+            <CommandItem
+              title="scaffold"
+              desc="Scaffold a React component with best practices."
+              example="dev-helper scaffold -n UserProfile"
+            />
+            <CommandItem
+              title="terminal"
+              desc="Get terminal commands to accomplish a goal."
+              example='dev-helper terminal -g "Set up a Node.js project with TypeScript"'
             />
             <CommandItem
               title="history"
-              desc="View your past queries and responses (requires login)."
+              desc="View your past queries and responses."
               example="dev-helper history"
             />
           </div>
@@ -224,11 +234,11 @@ export default function About() {
             ✨ Tips & Best Practices
           </h2>
           <ul style={{ listStyleType: 'disc', paddingLeft: '24px', color: 'rgb(200, 200, 200)', fontSize: '16px', lineHeight: '1.8' }}>
-            <li>Use the CLI in the root of your project for better context parsing.</li>
-            <li>Keep file inputs small — large files may be truncated.</li>
-            <li>Use <code style={{ backgroundColor: 'rgb(39, 39, 42)', padding: '2px 6px', borderRadius: '4px', color: 'rgb(74, 222, 128)' }}>--help</code> with any command to get inline usage info.</li>
-            <li>Use descriptive file names to improve AI understanding.</li>
-            <li>Run <code style={{ backgroundColor: 'rgb(39, 39, 42)', padding: '2px 6px', borderRadius: '4px', color: 'rgb(74, 222, 128)' }}>dev-helper login</code> before accessing history or making authenticated requests.</li>
+            <li>Use <code style={{ backgroundColor: 'rgb(39, 39, 42)', padding: '2px 6px', borderRadius: '4px', color: 'rgb(74, 222, 128)' }}>--context</code> flag to include surrounding project files for better analysis.</li>
+            <li>Keep file inputs under 100KB — large files may be truncated.</li>
+            <li>Use <code style={{ backgroundColor: 'rgb(39, 39, 42)', padding: '2px 6px', borderRadius: '4px', color: 'rgb(74, 222, 128)' }}>--help</code> with any command to see all available options.</li>
+            <li>Login uses the same credentials as the web app — register on the website first.</li>
+            <li>Your token is saved locally and expires after 7 days.</li>
           </ul>
         </div>
 

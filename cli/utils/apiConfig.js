@@ -6,7 +6,7 @@ import os from 'os';
 const CONFIG_FILE = path.join(os.homedir(), '.dev-helper', 'config.json');
 
 // Default to production API, fallback to localhost for development
-const DEFAULT_API_URL = 'https://dev-helper-api.onrender.com';
+const DEFAULT_API_URL = 'https://dev-helper-0uhn.onrender.com';
 
 /**
  * Get the API base URL from config or environment
