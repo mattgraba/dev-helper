@@ -1,167 +1,243 @@
-# Dev Helper 🚀  
-*A full-stack AI-powered developer assistant CLI + Web App*  
+# Dev Helper
 
-[![npm version](https://img.shields.io/npm/v/@mattgraba/dev-helper)](https://www.npmjs.com/package/@mattgraba/dev-helper)  
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)  
-[![Portfolio](https://img.shields.io/badge/Portfolio-mattgraba.com-blue?style=flat&logo=vercel)](https://mattgraba.com)
-[![GitHub](https://img.shields.io/badge/GitHub-mattgraba-black?style=flat&logo=github)](https://github.com/mattgraba)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-mattgraba-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/mattgraba)  
+A full-stack AI-powered developer assistant with CLI and web interfaces.
 
-Dev Helper is a modular, token-authenticated developer assistant that lets you **analyze, explain, fix, generate, and scaffold code directly from your terminal**. It also ships with a polished web app frontend for login, error submission, and history tracking — a true full-stack MVP.  
+[![npm version](https://img.shields.io/npm/v/@mattgraba/dev-helper)](https://www.npmjs.com/package/@mattgraba/dev-helper)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
+**Live Demo:** [dev-helper-zeta.vercel.app](https://dev-helper-zeta.vercel.app)
 
 ---
 
-## ✨ Features
-- 🔑 **JWT Authentication** (stored in `~/.dev-helper/config.json`)  
-- ⚡ **Project-Aware Analysis** with `--context` file scanning  
-- 🛠 **Full AI Toolkit**: analyze, explain, fix, generate, scaffold, terminal setup  
-- 💾 **History Storage** in MongoDB (query via CLI or web UI)  
-- 🖥 **Web Frontend**: login + error submission + history browsing  
-- 🌐 **Express API Backend** with OpenAI integration  
+## Overview
+
+Dev Helper is a modular, token-authenticated developer assistant that lets you analyze, explain, fix, generate, and scaffold code directly from your terminal. It also includes a web application for account management, code analysis, and history tracking.
+
+### Features
+
+- **JWT Authentication** — Secure login with credentials stored locally
+- **Project-Aware Analysis** — Include surrounding files for better context
+- **AI Toolkit** — Analyze, explain, fix, generate, scaffold, and get terminal commands
+- **History Tracking** — All queries saved and accessible via CLI or web UI
+- **Rate Limiting** — Built-in protection against API abuse
+- **File Upload** — Drag-and-drop support in web interface
 
 ---
 
-## 📦 Installation
+## Installation
 
 ```bash
 npm install -g @mattgraba/dev-helper
 ```
-Verify install:
+
+Verify the installation:
+
 ```bash
 dev-helper --help
 ```
 
 ---
 
-## 🚀 Quick Start
-Authenticate (stores JWT in `~/.dev-helper/config.json`):
+## Quick Start
+
+### 1. Create an Account
+
+Register at [dev-helper-zeta.vercel.app](https://dev-helper-zeta.vercel.app) to create your account.
+
+### 2. Authenticate
+
 ```bash
-dev-helper login --userId myUser123
+dev-helper login
 ```
+
+Enter your username and password when prompted. Your token is stored securely at `~/.dev-helper/config.json`.
+
+### 3. Start Using
+
 Analyze a file:
+
 ```bash
-dev-helper analyze --filePath index.js --context
+dev-helper analyze -f ./src/buggy.js -l javascript
 ```
-Generate a new component:
+
+Explain code:
+
 ```bash
-dev-helper generate -d "React form component" -o client/components/Form.jsx
+dev-helper explain -f ./utils/helper.py -l python
 ```
-Fix buggy code:
+
+Fix broken code:
+
 ```bash
-dev-helper fix -f broken.js -o fixed.js
+dev-helper fix -f ./broken.ts -l typescript
 ```
+
+Generate new code:
+
+```bash
+dev-helper generate -d "Create a React button component with hover state"
+```
+
+Scaffold a component:
+
+```bash
+dev-helper scaffold -n UserProfile
+```
+
+Get terminal commands:
+
+```bash
+dev-helper terminal -g "Set up a Node.js project with TypeScript and ESLint"
+```
+
 View history:
+
 ```bash
 dev-helper history
 ```
 
 ---
 
-## 🧩 CLI Usage & Architecture
-The Dev Helper CLI is structured with clean separation of concerns:
-```bash
-cli/
-├── cli.js                   # Main CLI entry (Commander)
-├── commands/                # Each CLI command
-│   ├── <command>.js         # Command registration
-│   ├── <command>Command.js  # Command logic & API interaction
-├── utils/
-│   ├── getToken.js
-│   ├── contextHandlerWrapper.js
-│   ├── fileScanner.js
-```
+## CLI Reference
 
----
-
-### Available Commands
-
-| Command    | Description                                                       |
-| ---------- | ----------------------------------------------------------------- |
-| `login`    | Authenticate and store JWT locally in `~/.dev-helper/config.json` |
-| `history`  | View previously saved AI responses from MongoDB                   |
-| `analyze`  | Send buggy code to AI and receive explanation + fix               |
-| `explain`  | Get a line-by-line explanation of a code file                     |
-| `fix`      | Clean buggy code and optionally overwrite/save output             |
-| `generate` | Generate new code from a description (e.g. “Express server”)      |
-| `scaffold` | Scaffold a component by name and save to a target location        |
-| `terminal` | Generate terminal setup commands based on a project goal          |
-
-> All commands (except `login`) require authentication and support `--context` for project-aware results.
-
----
+| Command    | Description                                      | Key Flags                    |
+| ---------- | ------------------------------------------------ | ---------------------------- |
+| `login`    | Authenticate with your Dev Helper account        | —                            |
+| `analyze`  | Analyze buggy code and receive explanation + fix | `-f <file>` `-l <language>`  |
+| `explain`  | Get a plain-English explanation of code          | `-f <file>` `-l <language>`  |
+| `fix`      | Generate a corrected version of broken code      | `-f <file>` `-l <language>`  |
+| `generate` | Generate code from a natural language prompt     | `-d <description>`           |
+| `scaffold` | Scaffold a React component with best practices   | `-n <name>`                  |
+| `terminal` | Get terminal commands for a specific goal        | `-g <goal>`                  |
+| `history`  | View your past queries and responses             | —                            |
 
 ### Context-Aware Mode
-Use the `--context` flag with major commands to include nearby project files:
-```js
-scanFiles({
-  directory: process.cwd(),
-  extensions: ['js', 'ts', 'json'],
-  maxFileSizeKB: 100
-})
-```
-Example:
+
+Use the `--context` flag to include surrounding project files for better analysis:
+
 ```bash
-dev-helper analyze --filePath index.js --context
+dev-helper analyze -f ./src/index.js -l javascript --context
 ```
 
----
+This scans nearby `.js`, `.ts`, and `.json` files (up to 100KB each) and includes them in the AI prompt.
 
-### Architecture Overview
+### Help
+
+Run `--help` on any command for detailed options:
+
 ```bash
-CLI Command
-   │
-   ├──> Handles input (commander)
-   │
-   ├──> Sends API request via axios to:
-   │     http://localhost:3001/<route>
-   │
-   ├──> Response printed or written to file
-   │
-   └──> Token read from ~/.dev-helper/config.json
+dev-helper analyze --help
 ```
-**Backend (Express)**
-- Receives CLI requests (`/analyze`, `/fix`, `/generate`, etc.)
-- Authenticates via JWT
-- Calls OpenAI API
-- Optionally saves results in MongoDB
-- Returns structured response to CLI
 
 ---
 
-### Auth File Location
-JWT token stored at:
-```arduino
-~/.dev-helper/config.json
+## Architecture
+
 ```
-Delete the file to reset authentication.
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   CLI Client    │────▶│  Express API    │────▶│   OpenAI API    │
+│  (Commander)    │     │  (Render)       │     │                 │
+└─────────────────┘     └────────┬────────┘     └─────────────────┘
+                                 │
+┌─────────────────┐              │
+│   Web Client    │──────────────┤
+│  (Vercel)       │              │
+└─────────────────┘              ▼
+                        ┌─────────────────┐
+                        │   MongoDB       │
+                        │   Atlas         │
+                        └─────────────────┘
+```
+
+### Tech Stack
+
+| Layer    | Technology                          |
+| -------- | ----------------------------------- |
+| CLI      | Node.js, Commander, Axios, Chalk    |
+| Frontend | React, Vite, Tailwind CSS           |
+| Backend  | Express, JWT, express-rate-limit    |
+| Database | MongoDB Atlas                       |
+| AI       | OpenAI GPT-4                        |
+| Hosting  | Vercel (frontend), Render (backend) |
 
 ---
 
-### History Storage
-The backend saves past prompt/response pairs in MongoDB.
+## Project Structure
 
-View them with:
+```
+dev-helper/
+├── cli/                    # CLI application
+│   ├── cli.js              # Main entry point (Commander)
+│   ├── commands/           # Command handlers
+│   └── utils/              # Token management, file scanning
+├── client/                 # React web application
+│   └── src/
+│       ├── pages/          # Route pages
+│       └── components/     # Reusable components
+├── server/                 # Express API server
+│   └── src/
+│       ├── routes/         # API endpoints
+│       ├── middleware/     # Auth, rate limiting
+│       └── utils/          # Error handling
+└── bin/                    # npm global binary
+```
+
+---
+
+## Configuration
+
+### Environment Variables
+
+**Server** (`server/.env`):
+
+```
+MONGODB_URI=<your-mongodb-connection-string>
+JWT_SECRET=<your-jwt-secret>
+OPENAI_API_KEY=<your-openai-api-key>
+```
+
+**Client** (`client/.env`):
+
+```
+VITE_API_URL=<your-api-url>
+```
+
+### Custom API URL
+
+For development or self-hosting, set a custom API URL:
+
 ```bash
-dev-helper history
+export DEV_HELPER_API_URL=http://localhost:3001
+```
+
+Or add it to `~/.dev-helper/config.json`:
+
+```json
+{
+  "token": "...",
+  "apiUrl": "http://localhost:3001"
+}
 ```
 
 ---
 
+## Philosophy
 
-## 🧭 Core Philosophy
-
-Dev Helper is built to accelerate engineers without replacing their thinking.
-It empowers intentional usage, promotes critical reasoning, augments fundamentals, and resists the “vibe-coding” shortcuts common in IDE auto-complete tools.
+Dev Helper is built to accelerate engineers without replacing their thinking. It promotes intentional usage and critical reasoning rather than passive auto-complete reliance.
 
 ---
 
-## 🤝 Contributing
-Pull requests are welcome! Please open an issue first to discuss proposed changes.
+## Contributing
+
+Pull requests are welcome. Please open an issue first to discuss proposed changes.
 
 ---
 
-## 📜 License
+## License
+
 MIT © [Matt Graba](https://mattgraba.com)
+
+---
 
 [![Portfolio](https://img.shields.io/badge/Portfolio-mattgraba.com-blue?style=flat&logo=vercel)](https://mattgraba.com)
 [![GitHub](https://img.shields.io/badge/GitHub-mattgraba-black?style=flat&logo=github)](https://github.com/mattgraba)
