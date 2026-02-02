@@ -1,6 +1,7 @@
 {
   "name": "@mattgraba/dev-helper",
-  "version": "1.0.3",
+  "version": "1.0.0",
+  "description": "An AI-powered developer assistant CLI for analyzing errors, debugging issues, and scaffolding projects.",
   "type": "module",
   "bin": {
     "dev-helper": "./bin/dev-helper.js"
@@ -8,15 +9,11 @@
   "files": [
     "bin",
     "cli",
-    "server/src",
-    "client/src",
-    "client/public",
     "README.md",
-    "package.json"
+    "LICENSE"
   ],
   "scripts": {
     "dev:cli": "node cli/cli.js",
-    "dev:server": "nodemon server/src/index.js",
     "test": "jest --detectOpenHandles --forceExit"
   },
   "keywords": [
@@ -24,7 +21,8 @@
     "developer-tools",
     "ai",
     "debugging",
-    "productivity"
+    "productivity",
+    "openai"
   ],
   "author": "Matt Graba",
   "license": "MIT",
@@ -36,40 +34,28 @@
     "url": "https://github.com/mattgraba/dev-helper/issues"
   },
   "homepage": "https://github.com/mattgraba/dev-helper#readme",
-  "description": "A full-stack developer assistant CLI + Web App for analyzing errors, debugging, and scaffolding projects.",
+  "engines": {
+    "node": ">=18"
+  },
+  "preferGlobal": true,
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
-    "@emailjs/browser": "^4.4.1",
-    "@radix-ui/react-slot": "^1.2.3",
-    "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.10.0",
-    "body-parser": "^2.2.0",
     "chalk": "^4.1.2",
-    "class-variance-authority": "^0.7.1",
-    "clsx": "^2.1.1",
     "commander": "^14.0.0",
-    "cors": "^2.8.5",
     "dotenv": "^17.2.0",
-    "express": "^5.1.0",
     "fast-glob": "^3.3.3",
     "ignore": "^7.0.5",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
-    "lucide-react": "^0.525.0",
-    "mongoose": "^8.16.0",
     "openai": "^5.20.3",
-    "ora": "^5.4.1",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0",
-    "react-redux": "^9.2.0",
-    "react-router-dom": "^7.6.3",
-    "shadcn-ui": "^0.9.5",
-    "tailwind-merge": "^3.3.1",
-    "tailwindcss-animate": "^1.0.7"
+    "ora": "^5.4.1"
   },
   "devDependencies": {
     "jest": "^30.0.4",
     "mongodb-memory-server": "^10.1.4",
-    "nodemon": "^3.1.10",
     "supertest": "^7.1.3"
   }
 }
