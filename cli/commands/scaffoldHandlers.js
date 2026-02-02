@@ -5,11 +5,12 @@ import chalk from 'chalk';
 import ora from 'ora';
 
 import getToken from '../utils/getToken.js';
-import { checkFileExists } from '../utils/fsUtils.js';
 import handleCliError from '../utils/errorHandler.js';
 import saveToHistory from '../utils/historySaver.js';
+import { apiEndpoint } from '../utils/apiConfig.js';
 
 async function handleScaffoldBasic({ name, outputPath }) {
+  let spinner;
   try {
     const token = getToken();
     if (!token) {
@@ -17,9 +18,9 @@ async function handleScaffoldBasic({ name, outputPath }) {
       process.exit(1);
     }
 
-    const spinner = ora(`Sending request to /scaffold for ${name}...`).start();
+    spinner = ora(`Scaffolding ${name}...`).start();
 
-    const res = await axios.post('http://localhost:3001/scaffold', {
+    const res = await axios.post(apiEndpoint('/scaffold'), {
       name,
     }, {
       headers: { Authorization: `Bearer ${token}` }
@@ -44,11 +45,10 @@ async function handleScaffoldBasic({ name, outputPath }) {
     });
 
   } catch (err) {
-    handleCliError('scaffold', err);
+    handleCliError(spinner, err, 'Scaffold failed');
   }
 }
 
 export {
   handleScaffoldBasic,
 };
-

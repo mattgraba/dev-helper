@@ -5,11 +5,12 @@ import chalk from 'chalk';
 import ora from 'ora';
 
 import getToken from '../utils/getToken.js';
-import { checkFileExists } from '../utils/fsUtils.js';
 import handleCliError from '../utils/errorHandler.js';
 import saveToHistory from '../utils/historySaver.js';
+import { apiEndpoint } from '../utils/apiConfig.js';
 
 async function handleGenerateBasic({ description, outputPath }) {
+  let spinner;
   try {
     const token = getToken();
     if (!token) {
@@ -17,8 +18,8 @@ async function handleGenerateBasic({ description, outputPath }) {
       process.exit(1);
     }
 
-    const spinner = ora('Sending request to /generate...').start();
-    const res = await axios.post('http://localhost:3001/generate', {
+    spinner = ora('Generating code...').start();
+    const res = await axios.post(apiEndpoint('/generate'), {
       description,
     }, {
       headers: { Authorization: `Bearer ${token}` }
@@ -43,11 +44,10 @@ async function handleGenerateBasic({ description, outputPath }) {
     });
 
   } catch (err) {
-    handleCliError('generate', err);
+    handleCliError(spinner, err, 'Generation failed');
   }
 }
 
 export {
   handleGenerateBasic,
 };
-

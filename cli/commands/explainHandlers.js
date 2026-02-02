@@ -9,8 +9,10 @@ import { scanFiles } from '../utils/fileScanner.js';
 import { checkFileExists } from '../utils/fsUtils.js';
 import handleCliError from '../utils/errorHandler.js';
 import saveToHistory from '../utils/historySaver.js';
+import { apiEndpoint } from '../utils/apiConfig.js';
 
 async function handleExplainBasic({ filePath, language }) {
+  let spinner;
   try {
     if (!checkFileExists(filePath)) {
       throw new Error(`File not found: ${filePath}`);
@@ -24,8 +26,8 @@ async function handleExplainBasic({ filePath, language }) {
 
     const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
-    const spinner = ora(`Sending ${filePath} to /explain...`).start();
-    const res = await axios.post('http://localhost:3001/explain', {
+    spinner = ora(`Explaining ${filePath}...`).start();
+    const res = await axios.post(apiEndpoint('/explain'), {
       codeSnippet: mainCode,
       language,
     }, {
@@ -44,11 +46,12 @@ async function handleExplainBasic({ filePath, language }) {
     });
 
   } catch (err) {
-    handleCliError('explain', err);
+    handleCliError(spinner, err, 'Explanation failed');
   }
 }
 
 async function handleExplainWithContext({ filePath, language }) {
+  let spinner;
   try {
     if (!checkFileExists(filePath)) {
       throw new Error(`File not found: ${filePath}`);
@@ -61,10 +64,10 @@ async function handleExplainWithContext({ filePath, language }) {
     }
 
     const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
-    const contextFiles = await scanFiles(path.dirname(filePath), filePath);
+    const contextFiles = await scanFiles({ directory: path.dirname(filePath) });
 
-    const spinner = ora(`Sending ${filePath} with context to /explain...`).start();
-    const res = await axios.post('http://localhost:3001/explain', {
+    spinner = ora(`Explaining ${filePath} with context...`).start();
+    const res = await axios.post(apiEndpoint('/explain'), {
       codeSnippet: mainCode,
       language,
       contextFiles,
@@ -84,7 +87,7 @@ async function handleExplainWithContext({ filePath, language }) {
     });
 
   } catch (err) {
-    handleCliError('explain', err);
+    handleCliError(spinner, err, 'Explanation failed');
   }
 }
 
@@ -92,4 +95,3 @@ export {
   handleExplainBasic,
   handleExplainWithContext,
 };
-

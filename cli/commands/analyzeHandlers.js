@@ -9,8 +9,10 @@ import { checkFileExists } from '../utils/fsUtils.js';
 import { scanFiles } from '../utils/fileScanner.js';
 import handleCliError from '../utils/errorHandler.js';
 import saveToHistory from '../utils/historySaver.js';
+import { apiEndpoint } from '../utils/apiConfig.js';
 
 async function handleAnalyzeBasic({ filePath, language }) {
+  let spinner;
   try {
     if (!checkFileExists(filePath)) {
       throw new Error(`File not found: ${filePath}`);
@@ -24,8 +26,8 @@ async function handleAnalyzeBasic({ filePath, language }) {
 
     const errorText = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
-    const spinner = ora(`Sending ${filePath} to /analyze...`).start();
-    const res = await axios.post('http://localhost:3001/analyze', {
+    spinner = ora(`Analyzing ${filePath}...`).start();
+    const res = await axios.post(apiEndpoint('/analyze'), {
       errorText,
       language,
     }, {
@@ -45,11 +47,12 @@ async function handleAnalyzeBasic({ filePath, language }) {
     });
 
   } catch (err) {
-    handleCliError('analyze', err);
+    handleCliError(spinner, err, 'Analysis failed');
   }
 }
 
 async function handleAnalyzeWithContext({ filePath, language }) {
+  let spinner;
   try {
     if (!checkFileExists(filePath)) {
       throw new Error(`File not found: ${filePath}`);
@@ -62,10 +65,10 @@ async function handleAnalyzeWithContext({ filePath, language }) {
     }
 
     const errorText = fs.readFileSync(path.resolve(filePath), 'utf-8');
-    const contextFiles = await scanFiles(path.dirname(filePath), filePath);
+    const contextFiles = await scanFiles({ directory: path.dirname(filePath) });
 
-    const spinner = ora(`Sending ${filePath} with context to /analyze...`).start();
-    const res = await axios.post('http://localhost:3001/analyze', {
+    spinner = ora(`Analyzing ${filePath} with context...`).start();
+    const res = await axios.post(apiEndpoint('/analyze'), {
       errorText,
       language,
       contextFiles,
@@ -86,7 +89,7 @@ async function handleAnalyzeWithContext({ filePath, language }) {
     });
 
   } catch (err) {
-    handleCliError('analyze', err);
+    handleCliError(spinner, err, 'Analysis failed');
   }
 }
 

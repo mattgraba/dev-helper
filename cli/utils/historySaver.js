@@ -1,6 +1,7 @@
 import axios from 'axios';
 import getToken from './getToken.js';
 import { jwtDecode } from 'jwt-decode';
+import { apiEndpoint } from './apiConfig.js';
 
 async function saveToHistory({ command, input, output }) {
   try {
@@ -11,10 +12,10 @@ async function saveToHistory({ command, input, output }) {
     const userId = decoded.id;
 
     if (!command) {
-        console.warn('⚠️ Warning: No command passed to saveToHistory');
-      }
+      console.warn('⚠️ Warning: No command passed to saveToHistory');
+    }
 
-    await axios.post('http://localhost:3001/history', {
+    await axios.post(apiEndpoint('/history'), {
       userId,
       command,
       input,
@@ -22,10 +23,9 @@ async function saveToHistory({ command, input, output }) {
     }, {
       headers: { Authorization: `Bearer ${token}` }
     });
-  } catch (err) {
-    console.error('⚠️ Failed to save to history:', err.message);
+  } catch {
+    // Silently fail - history saving shouldn't break the main command
   }
 }
 
 export default saveToHistory;
-

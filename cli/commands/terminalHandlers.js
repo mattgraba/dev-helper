@@ -3,8 +3,11 @@ import chalk from 'chalk';
 import ora from 'ora';
 import getToken from '../utils/getToken.js';
 import { scanFiles } from '../utils/fileScanner.js';
+import handleCliError from '../utils/errorHandler.js';
+import { apiEndpoint } from '../utils/apiConfig.js';
 
 async function handleTerminalBasic({ goal, context }) {
+  let spinner;
   try {
     const token = getToken();
     if (!token) {
@@ -12,9 +15,9 @@ async function handleTerminalBasic({ goal, context }) {
       process.exit(1);
     }
 
-    const spinner = ora('Sending request to /terminal...').start();
+    spinner = ora('Getting terminal commands...').start();
 
-    const res = await axios.post('http://localhost:3001/terminal', {
+    const res = await axios.post(apiEndpoint('/terminal'), {
       goal,
       context,
     }, {
@@ -22,7 +25,7 @@ async function handleTerminalBasic({ goal, context }) {
     });
 
     let { commands } = res.data;
-    if (!commands) throw new Error('No terminal commands returned from /terminal');
+    if (!commands) throw new Error('No terminal commands returned');
 
     commands = commands.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
 
@@ -31,11 +34,12 @@ async function handleTerminalBasic({ goal, context }) {
     console.log(commands);
 
   } catch (err) {
-    console.error('❌ Server error:\n', err.response?.data || err.message);
+    handleCliError(spinner, err, 'Terminal command generation failed');
   }
 }
 
 async function handleTerminalWithContext({ goal, contextText }) {
+  let spinner;
   try {
     const token = getToken();
     if (!token) {
@@ -43,11 +47,11 @@ async function handleTerminalWithContext({ goal, contextText }) {
       process.exit(1);
     }
 
-    const contextFiles = await scanFiles('.', 'terminal');
+    const contextFiles = await scanFiles({ directory: '.' });
 
-    const spinner = ora('Sending request with context to /terminal...').start();
+    spinner = ora('Getting terminal commands with context...').start();
 
-    const res = await axios.post('http://localhost:3001/terminal', {
+    const res = await axios.post(apiEndpoint('/terminal'), {
       goal,
       context: contextText,
       contextFiles,
@@ -56,7 +60,7 @@ async function handleTerminalWithContext({ goal, contextText }) {
     });
 
     let { commands } = res.data;
-    if (!commands) throw new Error('No terminal commands returned from /terminal');
+    if (!commands) throw new Error('No terminal commands returned');
 
     commands = commands.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
 
@@ -65,7 +69,7 @@ async function handleTerminalWithContext({ goal, contextText }) {
     console.log(commands);
 
   } catch (err) {
-    console.error('❌ Server error:\n', err.response?.data || err.message);
+    handleCliError(spinner, err, 'Terminal command generation failed');
   }
 }
 

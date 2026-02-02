@@ -4,8 +4,10 @@ import ora from 'ora';
 
 import getToken from '../utils/getToken.js';
 import handleCliError from '../utils/errorHandler.js';
+import { apiEndpoint } from '../utils/apiConfig.js';
 
-async function handleHistory({ userId }) {
+async function handleHistory() {
+  let spinner;
   try {
     const token = getToken();
     if (!token) {
@@ -13,11 +15,10 @@ async function handleHistory({ userId }) {
       process.exit(1);
     }
 
-    const spinner = ora('Fetching your history from /history...').start();
+    spinner = ora('Fetching your history...').start();
 
-    const res = await axios.get('http://localhost:3001/history', {
+    const res = await axios.get(apiEndpoint('/history'), {
       headers: { Authorization: `Bearer ${token}` },
-      params: userId ? { userId } : {},
     });
 
     spinner.succeed('History retrieved ✅');
@@ -36,7 +37,7 @@ async function handleHistory({ userId }) {
     });
 
   } catch (err) {
-    handleCliError('history', err);
+    handleCliError(spinner, err, 'Failed to fetch history');
   }
 }
 

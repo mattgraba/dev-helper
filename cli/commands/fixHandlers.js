@@ -9,8 +9,10 @@ import { scanFiles } from '../utils/fileScanner.js';
 import { checkFileExists } from '../utils/fsUtils.js';
 import handleCliError from '../utils/errorHandler.js';
 import saveToHistory from '../utils/historySaver.js';
+import { apiEndpoint } from '../utils/apiConfig.js';
 
 async function handleFixBasic({ filePath, language, outputPath }) {
+  let spinner;
   try {
     if (!checkFileExists(filePath)) {
       throw new Error(`File not found: ${filePath}`);
@@ -24,8 +26,8 @@ async function handleFixBasic({ filePath, language, outputPath }) {
 
     const originalCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
 
-    const spinner = ora(`Sending ${filePath} to /fix...`).start();
-    const res = await axios.post('http://localhost:3001/fix', {
+    spinner = ora(`Fixing ${filePath}...`).start();
+    const res = await axios.post(apiEndpoint('/fix'), {
       codeSnippet: originalCode,
       language,
     }, {
@@ -50,11 +52,12 @@ async function handleFixBasic({ filePath, language, outputPath }) {
     });
 
   } catch (err) {
-    handleCliError('fix', err);
+    handleCliError(spinner, err, 'Fix failed');
   }
 }
 
 async function handleFixWithContext({ filePath, language, outputPath }) {
+  let spinner;
   try {
     if (!checkFileExists(filePath)) {
       throw new Error(`File not found: ${filePath}`);
@@ -67,10 +70,10 @@ async function handleFixWithContext({ filePath, language, outputPath }) {
     }
 
     const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
-    const contextFiles = await scanFiles(path.dirname(filePath), filePath);
+    const contextFiles = await scanFiles({ directory: path.dirname(filePath) });
 
-    const spinner = ora(`Sending ${filePath} with context to /fix...`).start();
-    const res = await axios.post('http://localhost:3001/fix', {
+    spinner = ora(`Fixing ${filePath} with context...`).start();
+    const res = await axios.post(apiEndpoint('/fix'), {
       codeSnippet: mainCode,
       language,
       contextFiles,
@@ -96,7 +99,7 @@ async function handleFixWithContext({ filePath, language, outputPath }) {
     });
 
   } catch (err) {
-    handleCliError('fix', err);
+    handleCliError(spinner, err, 'Fix failed');
   }
 }
 
@@ -104,5 +107,3 @@ export {
   handleFixBasic,
   handleFixWithContext,
 };
-
-
