@@ -4,7 +4,7 @@
   "description": "An AI-powered developer assistant CLI for analyzing errors, debugging issues, and scaffolding projects.",
   "type": "module",
   "bin": {
-    "dev-helper": "./bin/dev-helper.js"
+    "dev-helper": "bin/dev-helper.js"
   },
   "files": [
     "bin",
