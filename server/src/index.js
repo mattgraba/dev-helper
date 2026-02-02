@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import path from `path`;
+import path from 'path';
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env") });
 
@@ -37,13 +37,22 @@ app.use('/history', historyRoutes);
 
 // Server Start
 const PORT = process.env.PORT || 3001;
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('✅ MongoDB connected');
-    app.listen(PORT, () => {
-      console.log(`🚀 Server is running on port ${PORT}`);
+
+// Start server regardless of MongoDB connection status
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+});
+
+// Connect to MongoDB (non-blocking)
+if (process.env.MONGO_URI) {
+  mongoose.connect(process.env.MONGO_URI)
+    .then(() => {
+      console.log('✅ MongoDB connected');
+    })
+    .catch((err) => {
+      console.warn('⚠️  MongoDB connection failed. History features will not work.');
+      console.warn('    Error:', err.message);
     });
-  })
-  .catch((err) => {
-    console.error('❌ MongoDB connection error:', err);
-  });
+} else {
+  console.warn('⚠️  MONGO_URI not set. History features will not work.');
+}

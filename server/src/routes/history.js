@@ -5,9 +5,9 @@ import authMiddleware from '../middleware/authMiddleware.js';
 
 router.get('/', authMiddleware, async (req, res) => {
   try {
-    const { userId } = req.query;
-    const filter = userId ? { userId } : {};
-    const results = await Response.find(filter).sort({ createdAt: -1 }).limit(20);
+    // Always filter by the authenticated user's ID
+    const userId = req.user.id;
+    const results = await Response.find({ userId }).sort({ createdAt: -1 }).limit(20);
 
     res.json(results);
   } catch (err) {

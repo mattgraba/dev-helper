@@ -22,14 +22,19 @@ ${context ? `\n\nProject context:\n${context}` : ''}
   try {
     const commands = await sendPrompt(prompt);
 
+    // Save to history (non-blocking, don't fail if MongoDB unavailable)
     if (req.user?.id) {
-      await Response.create({
-        userId: req.user.id,
-        input: goal,
-        output: commands,
-        command: 'terminal',
-        createdAt: new Date(),
-      });
+      try {
+        await Response.create({
+          userId: req.user.id,
+          input: goal,
+          output: commands,
+          command: 'terminal',
+          createdAt: new Date(),
+        });
+      } catch (dbErr) {
+        console.warn('Failed to save to history:', dbErr.message);
+      }
     }
 
     res.json({ commands });

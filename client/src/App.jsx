@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
+import Layout from './components/Layout';
 import LoginPage from './pages/Login';
+import RegisterPage from './pages/Register';
 import HistoryPage from './pages/History';
 import NotFound from './pages/NotFound';
-import HomePage from './pages/Home';
 import AnalyzePage from './pages/Analyze';
 import AboutPage from './pages/About';
-import ContactPage from './pages/Contact';
+import HomePage from './pages/Home';
 
 import PrivateRoute from './utils/privateRoute';
 
@@ -15,55 +16,68 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem('dev-helper-token'));
 
   useEffect(() => {
-    if (token) localStorage.setItem('dev-helper-token', token);
+    if (token) {
+      localStorage.setItem('dev-helper-token', token);
+    } else {
+      localStorage.removeItem('dev-helper-token');
+    }
   }, [token]);
 
   const handleLogin = (newToken) => {
     setToken(newToken);
   };
 
+  const handleLogout = () => {
+    setToken(null);
+  };
+
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage onLogin={setToken} />} />
+        {/* Auth pages without layout */}
+        <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+        <Route path="/register" element={<RegisterPage onRegister={handleLogin} />} />
 
+        {/* All other pages with layout */}
         <Route
-          path="/analyze"
+          path="/*"
           element={
-            <PrivateRoute token={token}>
-              <AnalyzePage />
-            </PrivateRoute>
+            <Layout token={token} onLogout={handleLogout}>
+              <Routes>
+                {/* Home page with Hero, Features, About */}
+                <Route path="/" element={<HomePage />} />
+
+                {/* CLI Usage page */}
+                <Route path="/about" element={<AboutPage />} />
+
+                {/* Protected Routes */}
+                <Route
+                  path="/analyze"
+                  element={
+                    <PrivateRoute token={token}>
+                      <AnalyzePage />
+                    </PrivateRoute>
+                  }
+                />
+
+                <Route
+                  path="/history"
+                  element={
+                    <PrivateRoute token={token}>
+                      <HistoryPage />
+                    </PrivateRoute>
+                  }
+                />
+
+                {/* 404 */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Layout>
           }
         />
-
-        <Route
-          path="/about"
-          element={
-            <AboutPage />
-          }
-        />
-
-        <Route
-          path="/contact"
-          element={
-            <ContactPage />
-          }
-        />
-
-        <Route
-          path="/history"
-          element={
-            <PrivateRoute token={token}>
-              <HistoryPage />
-            </PrivateRoute>
-          }
-        />
-
-        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
 }
-export default App;
 
+export default App;

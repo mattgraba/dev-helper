@@ -28,14 +28,19 @@ ${contextText ? `Context:\n\n${contextText}` : ''}
     const fullResponse = await sendPrompt(prompt);
     const { explanation, fix } = extractExplanationAndFix(fullResponse);
 
+    // Save to history (non-blocking, don't fail if MongoDB unavailable)
     if (req.user?.id) {
-      await Response.create({
-        userId: req.user.id,
-        input: errorText,
-        output: `${explanation}\n\n${fix}`,
-        command: 'analyze',
-        createdAt: new Date(),
-      });
+      try {
+        await Response.create({
+          userId: req.user.id,
+          input: errorText,
+          output: `${explanation}\n\n${fix}`,
+          command: 'analyze',
+          createdAt: new Date(),
+        });
+      } catch (dbErr) {
+        console.warn('Failed to save to history:', dbErr.message);
+      }
     }
 
     res.json({ explanation, fix });

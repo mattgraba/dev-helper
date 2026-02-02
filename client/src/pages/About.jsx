@@ -1,51 +1,179 @@
-import { Card, CardContent } from '@/components/ui/card';
 import { Code } from 'lucide-react';
 
-export default function about() {
+export default function About() {
   return (
-    <section className="max-w-4xl mx-auto px-6 py-10">
-      <h1 className="text-4xl font-bold text-white mb-6 flex items-center gap-3">
-        <Code className="w-8 h-8 text-indigo-400" />
-        Using Dev Helper AI via the CLI
-      </h1>
+    <div
+      style={{
+        minHeight: '100vh',
+        width: '100%',
+        backgroundColor: '#000',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: '80px 20px',
+      }}
+    >
+      <div style={{ width: '960px', maxWidth: '100%' }}>
+        {/* Page Header */}
+        <div style={{ textAlign: 'center', marginBottom: '80px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', marginBottom: '16px' }}>
+            <Code style={{ width: 32, height: 32, color: 'rgb(168, 85, 247)' }} />
+            <h1
+              style={{
+                fontFamily: 'Inter Variable, Inter, sans-serif',
+                fontSize: '48px',
+                fontWeight: 700,
+                letterSpacing: '-0.05em',
+                color: 'rgb(255, 255, 255)',
+                margin: 0,
+              }}
+            >
+              Using Dev Helper AI via the CLI
+            </h1>
+          </div>
+          <p
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '18px',
+              fontWeight: 400,
+              letterSpacing: '-0.01em',
+              color: 'rgb(119, 119, 119)',
+              lineHeight: '1.6',
+              maxWidth: '700px',
+              margin: '0 auto',
+            }}
+          >
+            The Dev Helper CLI is a powerful command-line assistant designed to help developers debug,
+            explain, fix, and generate code more efficiently. Once installed, you can use it from any terminal window.
+          </p>
+        </div>
 
-      <p className="text-gray-300 mb-8 text-lg">
-        The Dev Helper CLI is a powerful command-line assistant designed to help developers debug,
-        explain, fix, and generate code more efficiently. Once installed, you can use it from any terminal window.
-      </p>
-
-      {/* Installation */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <h2 className="text-xl font-semibold text-white mb-2">📦 Installation</h2>
-          <p className="text-gray-300 mb-2">To install the CLI globally:</p>
-          <pre className="bg-zinc-900 text-green-400 p-4 rounded text-sm overflow-x-auto">
+        {/* Installation Section */}
+        <div
+          style={{
+            backgroundColor: '#0d0d0d',
+            borderRadius: '20px',
+            padding: '40px',
+            marginBottom: '20px',
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: 'Inter Variable, Inter, sans-serif',
+              fontSize: '24px',
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              color: 'rgb(255, 255, 255)',
+              marginBottom: '16px',
+            }}
+          >
+            📦 Installation
+          </h2>
+          <p
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              color: 'rgb(200, 200, 200)',
+              marginBottom: '12px',
+            }}
+          >
+            To install the CLI globally:
+          </p>
+          <pre
+            style={{
+              backgroundColor: 'rgb(9, 9, 11)',
+              color: 'rgb(74, 222, 128)',
+              padding: '16px',
+              borderRadius: '12px',
+              fontSize: '14px',
+              fontFamily: 'monospace',
+              overflowX: 'auto',
+              border: '1px solid rgb(39, 39, 42)',
+            }}
+          >
             npm install -g dev-helper
           </pre>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Authentication */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <h2 className="text-xl font-semibold text-white mb-2">🔐 Authentication</h2>
-          <p className="text-gray-300 mb-2">
+        {/* Authentication Section */}
+        <div
+          style={{
+            backgroundColor: '#0d0d0d',
+            borderRadius: '20px',
+            padding: '40px',
+            marginBottom: '20px',
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: 'Inter Variable, Inter, sans-serif',
+              fontSize: '24px',
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              color: 'rgb(255, 255, 255)',
+              marginBottom: '16px',
+            }}
+          >
+            🔐 Authentication
+          </h2>
+          <p
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '16px',
+              color: 'rgb(200, 200, 200)',
+              marginBottom: '12px',
+            }}
+          >
             After installing, login to authenticate and receive your access token:
           </p>
-          <pre className="bg-zinc-900 text-green-400 p-4 rounded text-sm overflow-x-auto">
+          <pre
+            style={{
+              backgroundColor: 'rgb(9, 9, 11)',
+              color: 'rgb(74, 222, 128)',
+              padding: '16px',
+              borderRadius: '12px',
+              fontSize: '14px',
+              fontFamily: 'monospace',
+              overflowX: 'auto',
+              border: '1px solid rgb(39, 39, 42)',
+            }}
+          >
             dev-helper login
           </pre>
-          <p className="text-gray-400 mt-2 text-sm">
-            Your JWT will be securely saved locally at <code>~/.dev-helper/config.json</code>.
+          <p
+            style={{
+              fontFamily: 'Inter, sans-serif',
+              fontSize: '14px',
+              color: 'rgb(119, 119, 119)',
+              marginTop: '12px',
+            }}
+          >
+            Your JWT will be securely saved locally at <code style={{ backgroundColor: 'rgb(39, 39, 42)', padding: '2px 6px', borderRadius: '4px' }}>~/.dev-helper/config.json</code>.
           </p>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* CLI Commands */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">💡 Available Commands</h2>
-          <div className="space-y-4">
+        {/* CLI Commands Section */}
+        <div
+          style={{
+            backgroundColor: '#0d0d0d',
+            borderRadius: '20px',
+            padding: '40px',
+            marginBottom: '20px',
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: 'Inter Variable, Inter, sans-serif',
+              fontSize: '24px',
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              color: 'rgb(255, 255, 255)',
+              marginBottom: '24px',
+            }}
+          >
+            💡 Available Commands
+          </h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <CommandItem
               title="analyze"
               desc="Analyze an error or bug in a code file."
@@ -72,45 +200,112 @@ export default function about() {
               example="dev-helper history"
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Tips and Techniques */}
-      <Card className="mb-6">
-        <CardContent className="p-6">
-          <h2 className="text-xl font-semibold text-white mb-2">Tips & Best Practices</h2>
-          <ul className="list-disc list-inside text-gray-300 space-y-2">
+        {/* Tips and Best Practices Section */}
+        <div
+          style={{
+            backgroundColor: '#0d0d0d',
+            borderRadius: '20px',
+            padding: '40px',
+            marginBottom: '20px',
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: 'Inter Variable, Inter, sans-serif',
+              fontSize: '24px',
+              fontWeight: 600,
+              letterSpacing: '-0.02em',
+              color: 'rgb(255, 255, 255)',
+              marginBottom: '16px',
+            }}
+          >
+            ✨ Tips & Best Practices
+          </h2>
+          <ul style={{ listStyleType: 'disc', paddingLeft: '24px', color: 'rgb(200, 200, 200)', fontSize: '16px', lineHeight: '1.8' }}>
             <li>Use the CLI in the root of your project for better context parsing.</li>
             <li>Keep file inputs small — large files may be truncated.</li>
-            <li>Use <code>--help</code> with any command to get inline usage info.</li>
+            <li>Use <code style={{ backgroundColor: 'rgb(39, 39, 42)', padding: '2px 6px', borderRadius: '4px', color: 'rgb(74, 222, 128)' }}>--help</code> with any command to get inline usage info.</li>
             <li>Use descriptive file names to improve AI understanding.</li>
-            <li>Run <code>dev-helper login</code> before accessing history or making authenticated requests.</li>
+            <li>Run <code style={{ backgroundColor: 'rgb(39, 39, 42)', padding: '2px 6px', borderRadius: '4px', color: 'rgb(74, 222, 128)' }}>dev-helper login</code> before accessing history or making authenticated requests.</li>
           </ul>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Final Note */}
-      <div className="text-gray-400 text-sm mt-10">
-        For more examples, contribute to the open-source project, or report bugs, visit the{' '}
-        <a
-          href="https://github.com/your-username/dev-helper-ai"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-indigo-400 hover:underline"
+        {/* Footer Note */}
+        <div
+          style={{
+            textAlign: 'center',
+            marginTop: '80px',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '14px',
+            color: 'rgb(119, 119, 119)',
+          }}
         >
-          GitHub Repository →
-        </a>
+          For more examples, contribute to the open-source project, or report bugs, visit the{' '}
+          <a
+            href="https://github.com/mattgraba/dev-helper-ai"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: 'rgb(168, 85, 247)',
+              textDecoration: 'none',
+              fontWeight: 500,
+            }}
+            onMouseOver={(e) => {
+              e.target.style.textDecoration = 'underline';
+            }}
+            onMouseOut={(e) => {
+              e.target.style.textDecoration = 'none';
+            }}
+          >
+            GitHub Repository →
+          </a>
+        </div>
       </div>
-    </section>
+    </div>
   );
 }
 
 function CommandItem({ title, desc, example }) {
   return (
     <div>
-      <h3 className="text-white font-medium text-lg">{`• ${title}`}</h3>
-      <p className="text-gray-400 ml-4">{desc}</p>
-      <pre className="bg-zinc-900 text-green-400 p-3 mt-1 ml-4 rounded text-sm overflow-x-auto">
+      <h3
+        style={{
+          fontFamily: 'Inter Variable, Inter, sans-serif',
+          fontSize: '18px',
+          fontWeight: 600,
+          letterSpacing: '-0.01em',
+          color: 'rgb(255, 255, 255)',
+          marginBottom: '8px',
+        }}
+      >
+        • {title}
+      </h3>
+      <p
+        style={{
+          fontFamily: 'Inter, sans-serif',
+          fontSize: '15px',
+          color: 'rgb(161, 161, 170)',
+          marginBottom: '8px',
+          marginLeft: '16px',
+        }}
+      >
+        {desc}
+      </p>
+      <pre
+        style={{
+          backgroundColor: 'rgb(9, 9, 11)',
+          color: 'rgb(74, 222, 128)',
+          padding: '12px 16px',
+          borderRadius: '8px',
+          fontSize: '13px',
+          fontFamily: 'monospace',
+          overflowX: 'auto',
+          border: '1px solid rgb(39, 39, 42)',
+          marginLeft: '16px',
+        }}
+      >
         {example}
       </pre>
     </div>

@@ -23,14 +23,6 @@ export default function About() {
           </h2>
           <h2 className="text-[#777777] text-[15px] font-medium leading-[1.3em] tracking-[-0.01em] mb-[-25px]"
             style={{ fontWeight: 400 }} >
-            Building open-source projects
-          </h2>
-          <h2 className="text-[#777777] text-[15px] font-medium leading-[1.3em] tracking-[-0.01em] mb-[-5px]"
-            style={{ fontWeight: 400 }}>
-          and AI integrations is my passion.
-          </h2>
-          <h2 className="text-[#777777] text-[15px] font-medium leading-[1.3em] tracking-[-0.01em] mb-[-25px]"
-            style={{ fontWeight: 400 }} >
             Check out my work
           </h2>
           <h2 className="text-[#777777] text-[15px] font-medium leading-[1.3em] tracking-[-0.01em]"
@@ -49,7 +41,10 @@ export default function About() {
 
         {/* Buttons */}
         <div className="flex" style={{ gap: '10px' }}>
-          <button
+          <a
+            href="https://mattgraba.com"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
               backgroundColor: 'rgb(25, 25, 25)',
               color: 'white',
@@ -57,7 +52,9 @@ export default function About() {
               border: '1px',
               borderRadius: '9999px',
               fontSize: '14px',
-              fontWeight: '600'
+              fontWeight: '600',
+              textDecoration: 'none',
+              display: 'inline-block'
             }}
             onMouseOver={(e) => {
               e.target.style.backgroundColor = 'white';
@@ -69,8 +66,11 @@ export default function About() {
             }}
           >
             Portfolio
-          </button>
-          <button
+          </a>
+          <a
+            href="https://github.com/mattgraba"
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
               backgroundColor: 'rgb(25, 25, 25)',
               color: 'white',
@@ -78,7 +78,9 @@ export default function About() {
               border: '1px',
               borderRadius: '9999px',
               fontSize: '14px',
-              fontWeight: '600'
+              fontWeight: '600',
+              textDecoration: 'none',
+              display: 'inline-block'
             }}
             onMouseOver={(e) => {
               e.target.style.backgroundColor = 'white';
@@ -90,8 +92,9 @@ export default function About() {
             }}
           >
             GitHub
-          </button>
-          <button
+          </a>
+          <a
+            href="mailto:matt@mattgraba.com"
             style={{
               backgroundColor: 'rgb(25, 25, 25)',
               color: 'white',
@@ -99,7 +102,9 @@ export default function About() {
               border: '1px',
               borderRadius: '9999px',
               fontSize: '14px',
-              fontWeight: '600'
+              fontWeight: '600',
+              textDecoration: 'none',
+              display: 'inline-block'
             }}
             onMouseOver={(e) => {
               e.target.style.backgroundColor = 'white';
@@ -111,7 +116,7 @@ export default function About() {
             }}
           >
             Contact
-          </button>
+          </a>
         </div>
       </section>
     );

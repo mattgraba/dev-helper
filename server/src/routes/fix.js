@@ -26,14 +26,19 @@ ${contextText ? `Here is additional context:\n\n${contextText}` : ''}
   try {
     const fixedCode = await sendPrompt(prompt);
 
+    // Save to history (non-blocking, don't fail if MongoDB unavailable)
     if (req.user?.id) {
-      await Response.create({
-        userId: req.user.id,
-        input: codeSnippet,
-        output: fixedCode,
-        command: 'fix',
-        createdAt: new Date(),
-      });
+      try {
+        await Response.create({
+          userId: req.user.id,
+          input: codeSnippet,
+          output: fixedCode,
+          command: 'fix',
+          createdAt: new Date(),
+        });
+      } catch (dbErr) {
+        console.warn('Failed to save to history:', dbErr.message);
+      }
     }
 
     res.json({ fixedCode });

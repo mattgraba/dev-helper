@@ -13,7 +13,7 @@ import handleScaffold from './commands/scaffoldCommand.js';
 import handleTerminal from './commands/terminalCommand.js';
 import handleLogin from './commands/loginCommand.js';
 import handleHistory from './commands/historyCommand.js';
-import complianceCommands from './commands/compliance/index.js';
+// import complianceCommands from './commands/compliance/index.js'; // TODO: TypeScript not compiled
 
 // CLI Metadata: defines basic information when a user runs `dev-helper --help`
 program
@@ -31,10 +31,10 @@ handleLogin(program);
 handleScaffold(program);
 handleTerminal(program);
 
-const compliance = program.command("compliance")
-  .description("Compliance automation commands");
-
-complianceCommands(compliance);
+// TODO: Compliance commands disabled until TypeScript is compiled
+// const compliance = program.command("compliance")
+//   .description("Compliance automation commands");
+// complianceCommands(compliance);
 
 // Triggers the CLI to interpret the command-line arguments passed by the user (e.g., `dev-helper analyze`)
 program.parse(process.argv);

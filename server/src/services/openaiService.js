@@ -1,6 +1,14 @@
 import { OpenAI } from 'openai';
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 import { estimateTotalTokens } from '../utils/tokenEstimator.js';
+
+// Lazy-load OpenAI client to ensure env vars are loaded first
+let openai;
+function getOpenAIClient() {
+  if (!openai) {
+    openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  }
+  return openai;
+}
 
 const TOKEN_LIMIT = 8000; // for gpt-4 8k model; lower than hard max for safety
 
@@ -40,7 +48,7 @@ async function getAIResponse(errorText, language = 'JavaScript', contextFiles = 
     throw new Error(`Token estimate (${tokenCount}) exceeds safe limit (${TOKEN_LIMIT}). Please reduce context or file size.`);
   }
 
-  const completion = await openai.chat.completions.create({
+  const completion = await getOpenAIClient().chat.completions.create({
     model: 'gpt-4',
     messages: [
       { role: 'system', content: 'You are a helpful programming assistant.' },
@@ -57,7 +65,7 @@ async function getAIResponse(errorText, language = 'JavaScript', contextFiles = 
  * Generic prompt sender for flexible tasks like scaffolding
  */
 async function sendPrompt(prompt) {
-  const completion = await openai.chat.completions.create({
+  const completion = await getOpenAIClient().chat.completions.create({
     model: 'gpt-4',
     messages: [
       { role: 'system', content: 'You are a senior software engineer and project scaffolding expert.' },
