@@ -287,58 +287,6 @@ export default function Layout({ children, token, onLogout }) {
               >
                 GitHub
               </a>
-              <a
-                href="https://www.linkedin.com/in/mattgraba"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  backgroundColor: 'rgb(25, 25, 25)',
-                  color: 'white',
-                  padding: '8px 16px',
-                  borderRadius: '9999px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  display: 'inline-block',
-                  transition: 'all 0.2s',
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.backgroundColor = 'white';
-                  e.target.style.color = 'black';
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.backgroundColor = 'rgb(25, 25, 25)';
-                  e.target.style.color = 'white';
-                }}
-              >
-                LinkedIn
-              </a>
-              <a
-                href="https://mattgraba.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  backgroundColor: 'rgb(25, 25, 25)',
-                  color: 'white',
-                  padding: '8px 16px',
-                  borderRadius: '9999px',
-                  fontSize: '13px',
-                  fontWeight: 600,
-                  textDecoration: 'none',
-                  display: 'inline-block',
-                  transition: 'all 0.2s',
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.backgroundColor = 'white';
-                  e.target.style.color = 'black';
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.backgroundColor = 'rgb(25, 25, 25)';
-                  e.target.style.color = 'white';
-                }}
-              >
-                Portfolio
-              </a>
             </div>
           </div>
         </div>
