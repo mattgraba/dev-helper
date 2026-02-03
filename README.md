@@ -11,11 +11,14 @@ A full-stack AI-powered developer assistant with CLI and web interfaces.
 
 ## Overview
 
-Dev Helper is a modular, token-authenticated developer assistant that lets you analyze, explain, fix, generate, and scaffold code directly from your terminal. It also includes a web application for account management, code analysis, and history tracking.
+Dev Helper is a modular developer assistant that lets you analyze, explain, fix, generate, and scaffold code directly from your terminal. It supports two usage modes:
+
+- **BYOK (Bring Your Own Key)** — Use your own OpenAI API key, no account required
+- **Hosted Service** — Create an account and use the hosted API
 
 ### Features
 
-- **JWT Authentication** — Secure login with credentials stored locally
+- **Flexible Authentication** — Use your own OpenAI key or the hosted service
 - **Project-Aware Analysis** — Include surrounding files for better context
 - **AI Toolkit** — Analyze, explain, fix, generate, scaffold, and get terminal commands
 - **History Tracking** — All queries saved and accessible via CLI or web UI
@@ -40,19 +43,47 @@ dev-helper --help
 
 ## Quick Start
 
-### 1. Create an Account
+Choose your preferred setup method:
 
-Register at [dev-helper-zeta.vercel.app](https://dev-helper-zeta.vercel.app) to create your account.
+### Option A: Use Your Own OpenAI Key (BYOK)
 
-### 2. Authenticate
+The fastest way to get started. No account required.
+
+```bash
+# Set your OpenAI API key
+dev-helper config set-key sk-your-openai-api-key
+
+# Start using immediately
+dev-helper analyze -f ./src/buggy.js -l javascript
+```
+
+Your key is stored locally at `~/.dev-helper/config.json` and calls go directly to OpenAI.
+
+### Option B: Use the Hosted Service
+
+Use the managed service without managing your own API key.
+
+**1. Create an Account**
+
+Register at [dev-helper-zeta.vercel.app](https://dev-helper-zeta.vercel.app)
+
+**2. Authenticate**
 
 ```bash
 dev-helper login
 ```
 
-Enter your username and password when prompted. Your token is stored securely at `~/.dev-helper/config.json`.
+Enter your username and password when prompted.
 
-### 3. Start Using
+**3. Start Using**
+
+```bash
+dev-helper analyze -f ./src/buggy.js -l javascript
+```
+
+---
+
+## Usage Examples
 
 Analyze a file:
 
@@ -102,7 +133,8 @@ dev-helper history
 
 | Command    | Description                                      | Key Flags                    |
 | ---------- | ------------------------------------------------ | ---------------------------- |
-| `login`    | Authenticate with your Dev Helper account        | —                            |
+| `config`   | Manage configuration (API keys, settings)        | `set-key`, `remove-key`, `show` |
+| `login`    | Authenticate with the hosted service             | —                            |
 | `analyze`  | Analyze buggy code and receive explanation + fix | `-f <file>` `-l <language>`  |
 | `explain`  | Get a plain-English explanation of code          | `-f <file>` `-l <language>`  |
 | `fix`      | Generate a corrected version of broken code      | `-f <file>` `-l <language>`  |
@@ -110,6 +142,24 @@ dev-helper history
 | `scaffold` | Scaffold a React component with best practices   | `-n <name>`                  |
 | `terminal` | Get terminal commands for a specific goal        | `-g <goal>`                  |
 | `history`  | View your past queries and responses             | —                            |
+
+### Config Command
+
+Manage your dev-helper configuration:
+
+```bash
+# Show current configuration
+dev-helper config
+
+# Set your OpenAI API key (enables BYOK mode)
+dev-helper config set-key <your-openai-api-key>
+
+# Remove your stored API key
+dev-helper config remove-key
+
+# Show configuration details
+dev-helper config show
+```
 
 ### Context-Aware Mode
 
@@ -127,11 +177,25 @@ Run `--help` on any command for detailed options:
 
 ```bash
 dev-helper analyze --help
+dev-helper config --help
 ```
 
 ---
 
 ## Architecture
+
+### BYOK Mode (Bring Your Own Key)
+
+```
+┌─────────────────┐                    ┌─────────────────┐
+│   CLI Client    │───────────────────▶│   OpenAI API    │
+│  (Commander)    │   Direct calls     │                 │
+└─────────────────┘                    └─────────────────┘
+```
+
+No server, no account — your key, your costs, complete privacy.
+
+### Hosted Service Mode
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
@@ -169,7 +233,8 @@ dev-helper/
 ├── cli/                    # CLI application
 │   ├── cli.js              # Main entry point (Commander)
 │   ├── commands/           # Command handlers
-│   └── utils/              # Token management, file scanning
+│   ├── services/           # Local OpenAI service (BYOK)
+│   └── utils/              # Config management, file scanning
 ├── client/                 # React web application
 │   └── src/
 │       ├── pages/          # Route pages
@@ -186,9 +251,41 @@ dev-helper/
 
 ## Configuration
 
+### API Key Priority
+
+When running AI commands, dev-helper checks for an OpenAI key in this order:
+
+1. **Environment variable** `OPENAI_API_KEY` (highest priority)
+2. **Config file** `~/.dev-helper/config.json` → `openaiApiKey`
+3. **Hosted service** (requires login, uses server's key)
+
+### Config File
+
+Located at `~/.dev-helper/config.json`:
+
+```json
+{
+  "token": "jwt-token-for-hosted-service",
+  "apiUrl": "https://custom-api-url.com",
+  "openaiApiKey": "sk-your-openai-key"
+}
+```
+
+| Field | Description |
+|-------|-------------|
+| `token` | JWT token from `dev-helper login` (hosted service) |
+| `apiUrl` | Custom API URL (for self-hosting or development) |
+| `openaiApiKey` | Your OpenAI API key (BYOK mode) |
+
 ### Environment Variables
 
-**Server** (`server/.env`):
+**For BYOK users** — set your key as an environment variable:
+
+```bash
+export OPENAI_API_KEY=sk-your-openai-api-key
+```
+
+**For self-hosting** — server environment (`server/.env`):
 
 ```
 MONGODB_URI=<your-mongodb-connection-string>
@@ -214,10 +311,22 @@ Or add it to `~/.dev-helper/config.json`:
 
 ```json
 {
-  "token": "...",
   "apiUrl": "http://localhost:3001"
 }
 ```
+
+---
+
+## Usage Modes Comparison
+
+| Feature | BYOK Mode | Hosted Service |
+|---------|-----------|----------------|
+| Account required | No | Yes |
+| OpenAI key required | Yes (yours) | No |
+| API costs | You pay OpenAI directly | Included |
+| History tracking | Local only | Server + Web UI |
+| Privacy | Keys stay local | Keys on server |
+| Setup time | Instant | Create account |
 
 ---
 

@@ -1,6 +1,6 @@
 {
   "name": "@mattgraba/dev-helper",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "An AI-powered developer assistant CLI for analyzing errors, debugging issues, and scaffolding projects.",
   "type": "module",
   "bin": {
