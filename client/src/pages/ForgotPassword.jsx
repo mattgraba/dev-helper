@@ -107,7 +107,7 @@ export default function ForgotPassword() {
                   e.target.style.textDecoration = 'none';
                 }}
               >
-                support@devhelper.com
+                devhelper96@gmail.com
               </a>
             </div>
 

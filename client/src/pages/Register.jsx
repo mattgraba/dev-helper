@@ -95,7 +95,7 @@ export default function RegisterPage({ onRegister }) {
               letterSpacing: '-0.01em',
             }}
           >
-            Join Dev Helper AI to start analyzing code
+            Join Dev Helper to start analyzing code
           </p>
         </div>
 

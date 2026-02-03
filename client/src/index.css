@@ -21,3 +21,11 @@ html {
 *, *:before, *:after {
   box-sizing: inherit;
 }
+
+.text-box {
+  background: rgba(0, 0, 0, 0.55); /* black w/ transparency */
+  color: white;
+  padding: 0.5rem 3rem;
+  border-radius: 40px;
+  max-width: 1000px;
+}

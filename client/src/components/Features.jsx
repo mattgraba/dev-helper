@@ -1,8 +1,9 @@
-function FeatureCard({ icon, label, headline }) {
+function FeatureCard({ icon, label, headline, offset = 0 }) {
   return (
     <div
       className="feature-card"
       style={{
+        transform: `translateY(${offset}px)`,
         alignContent: 'center',
         alignItems: 'center',
         backgroundColor: 'var(--token-dbe12eec-d6ea-4e14-b331-3053c9d607dd, #0d0d0d)',
@@ -87,16 +88,19 @@ export default function Features() {
       }}
     >
       <FeatureCard
+        offset={-64}
         icon={<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="12" fill="#444" /></svg>}
         label="CLI"
         headline="For Terminal Pros"
       />
       <FeatureCard
+        offset={-64}
         icon={<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="12" fill="#444" /></svg>}
         label="Web"
         headline="Visual & Simple"
       />
       <FeatureCard
+        offset={-64}
         icon={<svg width="48" height="48" viewBox="0 0 48 48" fill="none"><rect width="48" height="48" rx="12" fill="#444" /></svg>}
         label="Choose"
         headline="Flex Your Workflow"

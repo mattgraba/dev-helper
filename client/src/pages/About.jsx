@@ -28,7 +28,7 @@ export default function About() {
                 margin: 0,
               }}
             >
-              Using Dev Helper AI via the CLI
+              Using Dev Helper via the CLI
             </h1>
           </div>
           <p
@@ -67,7 +67,7 @@ export default function About() {
               marginBottom: '16px',
             }}
           >
-            📦 Installation
+             Installation
           </h2>
           <p
             style={{
@@ -114,7 +114,7 @@ export default function About() {
               marginBottom: '16px',
             }}
           >
-            🔐 Authentication
+             Authentication
           </h2>
           <p
             style={{
@@ -171,7 +171,7 @@ export default function About() {
               marginBottom: '24px',
             }}
           >
-            💡 Available Commands
+             Available Commands
           </h2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
             <CommandItem
@@ -231,7 +231,7 @@ export default function About() {
               marginBottom: '16px',
             }}
           >
-            ✨ Tips & Best Practices
+             Best Practices
           </h2>
           <ul style={{ listStyleType: 'disc', paddingLeft: '24px', color: 'rgb(200, 200, 200)', fontSize: '16px', lineHeight: '1.8' }}>
             <li>Use <code style={{ backgroundColor: 'rgb(39, 39, 42)', padding: '2px 6px', borderRadius: '4px', color: 'rgb(74, 222, 128)' }}>--context</code> flag to include surrounding project files for better analysis.</li>
@@ -254,7 +254,7 @@ export default function About() {
         >
           For more examples, contribute to the open-source project, or report bugs, visit the{' '}
           <a
-            href="https://github.com/mattgraba/dev-helper-ai"
+            href="https://github.com/mattgraba/dev-helper"
             target="_blank"
             rel="noopener noreferrer"
             style={{

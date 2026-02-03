@@ -23,100 +23,12 @@ export default function About() {
           </h2>
           <h2 className="text-[#777777] text-[15px] font-medium leading-[1.3em] tracking-[-0.01em] mb-[-25px]"
             style={{ fontWeight: 400 }} >
-            Check out my work
+            Check out my work below
           </h2>
           <h2 className="text-[#777777] text-[15px] font-medium leading-[1.3em] tracking-[-0.01em]"
             style={{ fontWeight: 400 }} >
             or reach out for collaborations.
           </h2>
-        </div>
-  
-        {/* Find Me Online */}
-        <div className="flex flex-col gap-2">
-          <h2 className="text-[#777777] text-[13px] font-medium leading-[1.3em] mb-[-30px]"
-            style={{ fontWeight: 400 }} >
-            Find Me Online
-            </h2>
-        </div>
-
-        {/* Buttons */}
-        <div className="flex" style={{ gap: '10px' }}>
-          <a
-            href="https://mattgraba.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              backgroundColor: 'rgb(25, 25, 25)',
-              color: 'white',
-              padding: '0.8rem 1rem',
-              border: '1px',
-              borderRadius: '9999px',
-              fontSize: '14px',
-              fontWeight: '600',
-              textDecoration: 'none',
-              display: 'inline-block'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'white';
-              e.target.style.color = 'black';
-            }}
-            onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'black';
-              e.target.style.color = 'white';
-            }}
-          >
-            Portfolio
-          </a>
-          <a
-            href="https://github.com/mattgraba"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              backgroundColor: 'rgb(25, 25, 25)',
-              color: 'white',
-              padding: '0.8rem 1rem',
-              border: '1px',
-              borderRadius: '9999px',
-              fontSize: '14px',
-              fontWeight: '600',
-              textDecoration: 'none',
-              display: 'inline-block'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'white';
-              e.target.style.color = 'black';
-            }}
-            onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'black';
-              e.target.style.color = 'white';
-            }}
-          >
-            GitHub
-          </a>
-          <a
-            href="mailto:matt@mattgraba.com"
-            style={{
-              backgroundColor: 'rgb(25, 25, 25)',
-              color: 'white',
-              padding: '0.8rem 1rem',
-              border: '1px',
-              borderRadius: '9999px',
-              fontSize: '14px',
-              fontWeight: '600',
-              textDecoration: 'none',
-              display: 'inline-block'
-            }}
-            onMouseOver={(e) => {
-              e.target.style.backgroundColor = 'white';
-              e.target.style.color = 'black';
-            }}
-            onMouseOut={(e) => {
-              e.target.style.backgroundColor = 'black';
-              e.target.style.color = 'white';
-            }}
-          >
-            Contact
-          </a>
         </div>
       </section>
     );

@@ -11,7 +11,10 @@ export default function Home() {
         width: '100%', // <-- change from 100vw or auto to 100%
         alignContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#000',
+        backgroundImage: 'url("/home0.jpg")',
+        backgroundPosition: `top`,
+        backgroundSize: `100%`,
+        backgroundRepeat: `no-repeat`,
         display: 'flex',
         flexDirection: 'column',
         flexWrap: 'nowrap',

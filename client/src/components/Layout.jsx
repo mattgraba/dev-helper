@@ -49,7 +49,7 @@ export default function Layout({ children, token, onLogout }) {
               textDecoration: 'none',
             }}
           >
-            Dev Helper AI
+            Dev Helper
           </Link>
 
           {/* Navigation Links */}
@@ -240,7 +240,7 @@ export default function Layout({ children, token, onLogout }) {
                 margin: 0,
               }}
             >
-              © 2026 Dev Helper AI. Built by{' '}
+              2026 Dev Helper CLI. Built by{' '}
               <a
                 href="https://mattgraba.com"
                 target="_blank"
