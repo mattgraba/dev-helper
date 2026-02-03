@@ -5,26 +5,39 @@ import getToken from '../utils/getToken.js';
 import { scanFiles } from '../utils/fileScanner.js';
 import handleCliError from '../utils/errorHandler.js';
 import { apiEndpoint } from '../utils/apiConfig.js';
+import { hasLocalKey } from '../utils/configManager.js';
+import { getTerminalCommands } from '../services/localOpenAI.js';
 
 async function handleTerminalBasic({ goal, context }) {
   let spinner;
   try {
-    const token = getToken();
-    if (!token) {
-      console.error(chalk.red('❌ You must be logged in to use this command.'));
-      process.exit(1);
+    let commands;
+
+    if (hasLocalKey()) {
+      // BYOK mode: call OpenAI directly
+      spinner = ora('Getting terminal commands...').start();
+      const result = await getTerminalCommands({ goal, context });
+      commands = result.commands;
+    } else {
+      // Server mode: requires authentication
+      const token = getToken();
+      if (!token) {
+        console.error(chalk.red('❌ No API key or login found.'));
+        console.log(chalk.dim('Run "dev-helper config set-key <your-openai-key>" to use your own key.'));
+        console.log(chalk.dim('Or run "dev-helper login" to use the hosted service.'));
+        process.exit(1);
+      }
+
+      spinner = ora('Getting terminal commands...').start();
+      const res = await axios.post(apiEndpoint('/terminal'), {
+        goal,
+        context,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      commands = res.data.commands;
     }
 
-    spinner = ora('Getting terminal commands...').start();
-
-    const res = await axios.post(apiEndpoint('/terminal'), {
-      goal,
-      context,
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    let { commands } = res.data;
     if (!commands) throw new Error('No terminal commands returned');
 
     commands = commands.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();
@@ -41,25 +54,35 @@ async function handleTerminalBasic({ goal, context }) {
 async function handleTerminalWithContext({ goal, contextText }) {
   let spinner;
   try {
-    const token = getToken();
-    if (!token) {
-      console.error(chalk.red('❌ You must be logged in to use this command.'));
-      process.exit(1);
+    const contextFiles = await scanFiles({ directory: '.' });
+    let commands;
+
+    if (hasLocalKey()) {
+      // BYOK mode: call OpenAI directly
+      spinner = ora('Getting terminal commands with context...').start();
+      const result = await getTerminalCommands({ goal, context: contextText, contextFiles });
+      commands = result.commands;
+    } else {
+      // Server mode: requires authentication
+      const token = getToken();
+      if (!token) {
+        console.error(chalk.red('❌ No API key or login found.'));
+        console.log(chalk.dim('Run "dev-helper config set-key <your-openai-key>" to use your own key.'));
+        console.log(chalk.dim('Or run "dev-helper login" to use the hosted service.'));
+        process.exit(1);
+      }
+
+      spinner = ora('Getting terminal commands with context...').start();
+      const res = await axios.post(apiEndpoint('/terminal'), {
+        goal,
+        context: contextText,
+        contextFiles,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      commands = res.data.commands;
     }
 
-    const contextFiles = await scanFiles({ directory: '.' });
-
-    spinner = ora('Getting terminal commands with context...').start();
-
-    const res = await axios.post(apiEndpoint('/terminal'), {
-      goal,
-      context: contextText,
-      contextFiles,
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    let { commands } = res.data;
     if (!commands) throw new Error('No terminal commands returned');
 
     commands = commands.replace(/```[a-zA-Z]*\n?/, '').replace(/```$/, '').trim();

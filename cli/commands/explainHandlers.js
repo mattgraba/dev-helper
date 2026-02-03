@@ -10,6 +10,8 @@ import { checkFileExists } from '../utils/fsUtils.js';
 import handleCliError from '../utils/errorHandler.js';
 import saveToHistory from '../utils/historySaver.js';
 import { apiEndpoint } from '../utils/apiConfig.js';
+import { hasLocalKey } from '../utils/configManager.js';
+import { explainCode } from '../services/localOpenAI.js';
 
 async function handleExplainBasic({ filePath, language }) {
   let spinner;
@@ -18,25 +20,36 @@ async function handleExplainBasic({ filePath, language }) {
       throw new Error(`File not found: ${filePath}`);
     }
 
-    const token = getToken();
-    if (!token) {
-      console.error(chalk.red('❌ You must be logged in to use this command.'));
-      process.exit(1);
-    }
-
     const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
+    let explanation;
 
-    spinner = ora(`Explaining ${filePath}...`).start();
-    const res = await axios.post(apiEndpoint('/explain'), {
-      codeSnippet: mainCode,
-      language,
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    if (hasLocalKey()) {
+      // BYOK mode: call OpenAI directly
+      spinner = ora(`Explaining ${filePath}...`).start();
+      const result = await explainCode({ codeSnippet: mainCode, language });
+      explanation = result.explanation;
+    } else {
+      // Server mode: requires authentication
+      const token = getToken();
+      if (!token) {
+        console.error(chalk.red('❌ No API key or login found.'));
+        console.log(chalk.dim('Run "dev-helper config set-key <your-openai-key>" to use your own key.'));
+        console.log(chalk.dim('Or run "dev-helper login" to use the hosted service.'));
+        process.exit(1);
+      }
+
+      spinner = ora(`Explaining ${filePath}...`).start();
+      const res = await axios.post(apiEndpoint('/explain'), {
+        codeSnippet: mainCode,
+        language,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      explanation = res.data.explanation;
+    }
 
     spinner.succeed('Explanation complete ✅');
 
-    const { explanation } = res.data;
     console.log(chalk.green('\n📖 Explanation:\n'), explanation);
 
     await saveToHistory({
@@ -57,27 +70,38 @@ async function handleExplainWithContext({ filePath, language }) {
       throw new Error(`File not found: ${filePath}`);
     }
 
-    const token = getToken();
-    if (!token) {
-      console.error(chalk.red('❌ You must be logged in to use this command.'));
-      process.exit(1);
-    }
-
     const mainCode = fs.readFileSync(path.resolve(filePath), 'utf-8');
     const contextFiles = await scanFiles({ directory: path.dirname(filePath) });
+    let explanation;
 
-    spinner = ora(`Explaining ${filePath} with context...`).start();
-    const res = await axios.post(apiEndpoint('/explain'), {
-      codeSnippet: mainCode,
-      language,
-      contextFiles,
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    if (hasLocalKey()) {
+      // BYOK mode: call OpenAI directly
+      spinner = ora(`Explaining ${filePath} with context...`).start();
+      const result = await explainCode({ codeSnippet: mainCode, language, contextFiles });
+      explanation = result.explanation;
+    } else {
+      // Server mode: requires authentication
+      const token = getToken();
+      if (!token) {
+        console.error(chalk.red('❌ No API key or login found.'));
+        console.log(chalk.dim('Run "dev-helper config set-key <your-openai-key>" to use your own key.'));
+        console.log(chalk.dim('Or run "dev-helper login" to use the hosted service.'));
+        process.exit(1);
+      }
+
+      spinner = ora(`Explaining ${filePath} with context...`).start();
+      const res = await axios.post(apiEndpoint('/explain'), {
+        codeSnippet: mainCode,
+        language,
+        contextFiles,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      explanation = res.data.explanation;
+    }
 
     spinner.succeed('Contextual explanation complete ✅');
 
-    const { explanation } = res.data;
     console.log(chalk.green('\n📖 Explanation:\n'), explanation);
 
     await saveToHistory({

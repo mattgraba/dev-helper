@@ -8,27 +8,39 @@ import getToken from '../utils/getToken.js';
 import handleCliError from '../utils/errorHandler.js';
 import saveToHistory from '../utils/historySaver.js';
 import { apiEndpoint } from '../utils/apiConfig.js';
+import { hasLocalKey } from '../utils/configManager.js';
+import { scaffoldCode as scaffoldCodeLocal } from '../services/localOpenAI.js';
 
 async function handleScaffoldBasic({ name, outputPath }) {
   let spinner;
   try {
-    const token = getToken();
-    if (!token) {
-      console.error(chalk.red('❌ You must be logged in to use this command.'));
-      process.exit(1);
+    let scaffoldCode;
+
+    if (hasLocalKey()) {
+      // BYOK mode: call OpenAI directly
+      spinner = ora(`Scaffolding ${name}...`).start();
+      const result = await scaffoldCodeLocal({ name });
+      scaffoldCode = result.scaffoldCode;
+    } else {
+      // Server mode: requires authentication
+      const token = getToken();
+      if (!token) {
+        console.error(chalk.red('❌ No API key or login found.'));
+        console.log(chalk.dim('Run "dev-helper config set-key <your-openai-key>" to use your own key.'));
+        console.log(chalk.dim('Or run "dev-helper login" to use the hosted service.'));
+        process.exit(1);
+      }
+
+      spinner = ora(`Scaffolding ${name}...`).start();
+      const res = await axios.post(apiEndpoint('/scaffold'), {
+        name,
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      scaffoldCode = res.data.scaffoldCode;
     }
 
-    spinner = ora(`Scaffolding ${name}...`).start();
-
-    const res = await axios.post(apiEndpoint('/scaffold'), {
-      name,
-    }, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
     spinner.succeed('Scaffold complete ✅');
-
-    const { scaffoldCode } = res.data;
 
     if (outputPath) {
       const fullPath = path.resolve(outputPath);
