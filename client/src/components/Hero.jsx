@@ -12,13 +12,13 @@ export default function Hero() {
           <h1 
             className="text-[2.0vw] font-extrabold leading-none tracking-[-0.05em] mb-[-38px]"
             style={{ color: 'rgb(255, 255, 255)', fontWeight: 700 }}>
-            Your AI Debugging Assistant.
+            Your Debugging Assistant.
           </h1>
           <p
             className="text-[2.0vw] leading-none tracking-[-0.05em]"
             style={{ color: 'rgb(119, 119, 119)', fontWeight: 700 }}
           >
-            Analyze and fix code errors fast with AI.
+            Analyze and fix code errors fast via CLI.
           </p>
         </div>
 
