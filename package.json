@@ -22,7 +22,9 @@
     "ai",
     "debugging",
     "productivity",
-    "openai"
+    "openai",
+    "byok",
+    "open-source"
   ],
   "author": "Matt Graba",
   "license": "MIT",
