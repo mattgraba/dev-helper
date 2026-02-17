@@ -12,25 +12,30 @@ import saveToHistory from '../utils/historySaver.js';
 import { apiEndpoint } from '../utils/apiConfig.js';
 import { hasLocalKey } from '../utils/configManager.js';
 import { analyzeCode } from '../services/localOpenAI.js';
+import { renderAnalysisBox, parseAnalysisJSON } from '../utils/formatBox.js';
 
-async function handleAnalyzeBasic({ filePath, language }) {
+/**
+ * Runs the analyze flow: read file, call AI, render boxed result.
+ */
+async function runAnalyze({ filePath, language, contextFiles = null }) {
   let spinner;
   try {
     if (!checkFileExists(filePath)) {
       throw new Error(`File not found: ${filePath}`);
     }
 
+    spinner = ora(`Reading ${filePath}...`).start();
     const errorText = fs.readFileSync(path.resolve(filePath), 'utf-8');
-    let explanation, fix;
+    spinner.succeed(`Reading ${filePath}...`);
+
+    let rawResponse;
 
     if (hasLocalKey()) {
-      // BYOK mode: call OpenAI directly
-      spinner = ora(`Analyzing ${filePath}...`).start();
-      const result = await analyzeCode({ errorText, language });
-      explanation = result.explanation;
-      fix = result.fix;
+      spinner = ora('Processing with OpenAI...').start();
+      const result = await analyzeCode({ errorText, language, contextFiles: contextFiles || [] });
+      rawResponse = result.raw;
+      spinner.succeed('Processing with OpenAI...');
     } else {
-      // Server mode: requires authentication
       const token = getToken();
       if (!token) {
         console.error(chalk.red('❌ No API key or login found.'));
@@ -39,86 +44,54 @@ async function handleAnalyzeBasic({ filePath, language }) {
         process.exit(1);
       }
 
-      spinner = ora(`Analyzing ${filePath}...`).start();
+      spinner = ora('Sending to /api/analyze...').start();
       const res = await axios.post(apiEndpoint('/analyze'), {
         errorText,
         language,
+        contextFiles: contextFiles || [],
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      explanation = res.data.explanation;
-      fix = res.data.fix;
+      spinner.succeed('Sending to /api/analyze...');
+
+      // Server may return structured or legacy format
+      if (res.data.issues) {
+        rawResponse = JSON.stringify(res.data);
+      } else {
+        rawResponse = JSON.stringify({
+          issues: [{ line: null, title: 'Analysis', detail: res.data.explanation || '' }],
+          suggestion: res.data.fix || '',
+        });
+      }
     }
 
-    spinner.succeed('Analysis complete ✅');
+    console.log('');
 
-    console.log(chalk.green('\n🧠 Explanation:\n'), explanation);
-    console.log(chalk.blue('\n🔧 Suggested Fix:\n'), fix);
+    const parsed = parseAnalysisJSON(rawResponse);
+    renderAnalysisBox({ filePath, ...parsed });
+
+    console.log('');
 
     await saveToHistory({
       command: 'analyze',
       input: errorText,
-      output: `${explanation}\n\n${fix}`,
+      output: rawResponse,
     });
+    console.log(chalk.green('  ✓ Response saved to history'));
+    console.log(chalk.green('  ✓ Analysis complete'));
 
   } catch (err) {
     handleCliError(spinner, err, 'Analysis failed');
   }
 }
 
+async function handleAnalyzeBasic({ filePath, language }) {
+  await runAnalyze({ filePath, language });
+}
+
 async function handleAnalyzeWithContext({ filePath, language }) {
-  let spinner;
-  try {
-    if (!checkFileExists(filePath)) {
-      throw new Error(`File not found: ${filePath}`);
-    }
-
-    const errorText = fs.readFileSync(path.resolve(filePath), 'utf-8');
-    const contextFiles = await scanFiles({ directory: path.dirname(filePath) });
-    let explanation, fix;
-
-    if (hasLocalKey()) {
-      // BYOK mode: call OpenAI directly
-      spinner = ora(`Analyzing ${filePath} with context...`).start();
-      const result = await analyzeCode({ errorText, language, contextFiles });
-      explanation = result.explanation;
-      fix = result.fix;
-    } else {
-      // Server mode: requires authentication
-      const token = getToken();
-      if (!token) {
-        console.error(chalk.red('❌ No API key or login found.'));
-        console.log(chalk.dim('Run "dev-helper config set-key <your-openai-key>" to use your own key.'));
-        console.log(chalk.dim('Or run "dev-helper login" to use the hosted service.'));
-        process.exit(1);
-      }
-
-      spinner = ora(`Analyzing ${filePath} with context...`).start();
-      const res = await axios.post(apiEndpoint('/analyze'), {
-        errorText,
-        language,
-        contextFiles,
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      explanation = res.data.explanation;
-      fix = res.data.fix;
-    }
-
-    spinner.succeed('Contextual analysis complete ✅');
-
-    console.log(chalk.green('\n🧠 Explanation:\n'), explanation);
-    console.log(chalk.blue('\n🔧 Suggested Fix:\n'), fix);
-
-    await saveToHistory({
-      command: 'analyze',
-      input: errorText,
-      output: `${explanation}\n\n${fix}`,
-    });
-
-  } catch (err) {
-    handleCliError(spinner, err, 'Analysis failed');
-  }
+  const contextFiles = await scanFiles({ directory: path.dirname(path.resolve(filePath)) });
+  await runAnalyze({ filePath, language, contextFiles });
 }
 
 export {

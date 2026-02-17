@@ -15,19 +15,39 @@ router.post('/', authMiddleware, async (req, res) => {
 
   const contextText = contextFiles.map(f => `// ${f.name}\n${f.content}`).join('\n\n');
 
-  const prompt = `
-You're an AI debugger. Analyze the following ${language} code, explain the error, and suggest a fix:
+  const prompt = `Analyze the following ${language} code for bugs, errors, and issues.
 
 \`\`\`${language}
 ${errorText}
 \`\`\`
 
-${contextText ? `Context:\n\n${contextText}` : ''}
-`;
+${contextText ? `Context files:\n\n${contextText}\n` : ''}
+Respond ONLY with valid JSON in this exact format (no markdown fences, no extra text):
+{
+  "issues": [
+    { "line": <line_number_or_null>, "title": "<short title>", "detail": "<1-2 sentence explanation>" }
+  ],
+  "suggestion": "<concise fix recommendation covering all issues>"
+}`;
 
   try {
     const fullResponse = await sendPrompt(prompt);
-    const { explanation, fix } = extractExplanationAndFix(fullResponse);
+
+    // Try to parse structured JSON response
+    let issues, suggestion;
+    try {
+      let text = fullResponse.trim();
+      const fenceMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)```/i);
+      if (fenceMatch) text = fenceMatch[1].trim();
+      const parsed = JSON.parse(text);
+      issues = parsed.issues || [];
+      suggestion = parsed.suggestion || '';
+    } catch {
+      // Fallback to legacy format
+      const { explanation, fix } = extractExplanationAndFix(fullResponse);
+      issues = [{ line: null, title: 'Analysis', detail: explanation }];
+      suggestion = fix;
+    }
 
     // Save to history (non-blocking, don't fail if MongoDB unavailable)
     if (req.user?.id) {
@@ -35,7 +55,7 @@ ${contextText ? `Context:\n\n${contextText}` : ''}
         await Response.create({
           userId: req.user.id,
           input: errorText,
-          output: `${explanation}\n\n${fix}`,
+          output: JSON.stringify({ issues, suggestion }),
           command: 'analyze',
           createdAt: new Date(),
         });
@@ -44,7 +64,7 @@ ${contextText ? `Context:\n\n${contextText}` : ''}
       }
     }
 
-    res.json({ explanation, fix });
+    res.json({ issues, suggestion });
   } catch (err) {
     const { status, message, retryAfter } = handleOpenAIError(err);
     const response = { error: message };

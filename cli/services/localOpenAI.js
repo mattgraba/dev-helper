@@ -52,18 +52,23 @@ function extractExplanationAndFix(aiResponse) {
 async function analyzeCode({ errorText, language = 'JavaScript', contextFiles = [] }) {
   const contextText = contextFiles.map(f => `// ${f.filename || f.name}\n${f.content}`).join('\n\n');
 
-  const prompt = `
-You're an AI debugger. Analyze the following ${language} code, explain the error, and suggest a fix:
+  const prompt = `Analyze the following ${language} code for bugs, errors, and issues.
 
 \`\`\`${language}
 ${errorText}
 \`\`\`
 
-${contextText ? `Context:\n\n${contextText}` : ''}
-`;
+${contextText ? `Context files:\n\n${contextText}\n` : ''}
+Respond ONLY with valid JSON in this exact format (no markdown fences, no extra text):
+{
+  "issues": [
+    { "line": <line_number_or_null>, "title": "<short title>", "detail": "<1-2 sentence explanation>" }
+  ],
+  "suggestion": "<concise fix recommendation covering all issues>"
+}`;
 
-  const fullResponse = await sendPrompt(prompt, 'You are a helpful programming assistant.');
-  return extractExplanationAndFix(fullResponse);
+  const fullResponse = await sendPrompt(prompt, 'You are a senior software engineer. Always respond with valid JSON only.');
+  return { raw: fullResponse };
 }
 
 async function explainCode({ codeSnippet, language = 'JavaScript', contextFiles = [] }) {
